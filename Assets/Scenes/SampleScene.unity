@@ -760,6 +760,50 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 20
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &331495840
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 331495842}
+  - component: {fileID: 331495841}
+  m_Layer: 0
+  m_Name: MazeCreator
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &331495841
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 331495840}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 07ab7b7ed1f3bad4099ab948dfc51d8d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &331495842
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 331495840}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -45.559986, y: -121.44469, z: 147.3853}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 27
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &475751958
 GameObject:
   m_ObjectHideFlags: 0
@@ -2162,13 +2206,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b1268246ee141434d8a644b59ac5626d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mazeCreator: {fileID: 331495841}
   blockGameObject: {fileID: 3715377389320621339, guid: 3258539d8cdfd3945a199dbf886472bf,
     type: 3}
-  wallToSpawn: {fileID: 1051332823795442218, guid: 47e345b2c51b8374490d03b784a491af,
+  wallToSpawn: {fileID: 3859365513181134829, guid: 47e345b2c51b8374490d03b784a491af,
     type: 3}
   outerWall: {fileID: 8228499940348335620, guid: 61601570c9e415e4eb9e39fb695e0f81,
     type: 3}
   hole: {fileID: 8783908828905488341, guid: a4a1018c984bc9a4eb6b51eecb2a6476, type: 3}
+  holeSpawnPercent: 10
+  holeLength: 5
 --- !u!4 &1187507514
 Transform:
   m_ObjectHideFlags: 0

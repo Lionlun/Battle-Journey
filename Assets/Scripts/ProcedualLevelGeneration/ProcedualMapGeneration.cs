@@ -1,13 +1,15 @@
-using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.ExceptionServices;
 using System.Threading.Tasks;
 using UnityEngine;
 
 public class ProcedualMapGeneration : MonoBehaviour
 {
-    public GameObject blockGameObject;
-    public GameObject wallToSpawn;
+	[SerializeField] MazeCreator mazeCreator;
+
+
+
+	public GameObject blockGameObject;
+    public Transform wallToSpawn;
     public GameObject outerWall;
     public GameObject hole;
 
@@ -21,14 +23,20 @@ public class ProcedualMapGeneration : MonoBehaviour
 
     private byte[,] blocksGrid;
 
+	[SerializeField] int holeSpawnPercent = 10;
+	[SerializeField] int holeLength = 5;
+
 
     private int holesNumber = 4;
 
     void Start()
     {
-        InitiateGrid();
+		
+
+		InitiateGrid();
 	
 		SrartGeneration();
+
 	}
     async void SrartGeneration()
     {
@@ -39,13 +47,54 @@ public class ProcedualMapGeneration : MonoBehaviour
 	}
     private void SpawnWall()
     {
-        for (int c = 0; c < 20; c++)
-        {
-            GameObject toPlaceObject = Instantiate (wallToSpawn, ObjectSpawnLocation(), Quaternion.identity);
-        }
-    }
+		var maze = MazeGenerator.Generate(worldSizeX, worldSizeZ);
 
-    private Vector3 ObjectSpawnLocation()
+		for (int x = 0; x < worldSizeX; x++)
+		{
+			for (int z = 0; z < worldSizeZ; z++)
+			{
+				Vector3 pos = new Vector3(x * gridOffset, transform.position.y, z * gridOffset);
+
+
+				if (blocksGrid[x, z] == 3)
+				{
+
+					mazeCreator.Create(maze[x,z], pos, wallToSpawn);
+
+					GameObject block = Instantiate(blockGameObject, pos, Quaternion.identity);
+					blockPositions.Add(block.transform.position);
+					blocks.Add(block);
+
+					block.transform.SetParent(this.transform);
+				}
+			}
+		}
+
+
+
+
+
+		/*for (int x = 0; x < worldSizeX; x++)
+		{
+			for (int z = 0; z < worldSizeZ; z++)
+			{
+				Vector3 pos = new Vector3(x * gridOffset, transform.position.y, z * gridOffset);
+
+				if (blocksGrid[x, z] == 3)
+				{
+					GameObject wall = Instantiate(wallToSpawn, pos, Quaternion.identity);
+
+					GameObject block = Instantiate(blockGameObject, pos, Quaternion.identity);
+					blockPositions.Add(block.transform.position);
+					blocks.Add(block);
+
+					block.transform.SetParent(this.transform);
+				}
+			}
+		}*/
+	}
+
+	private Vector3 ObjectSpawnLocation()
     {
         int randomIndex = Random.Range(0, blockPositions.Count);
 
@@ -55,7 +104,23 @@ public class ProcedualMapGeneration : MonoBehaviour
     }
     async void SpawnHoles()
     {
-		for (int i = 0; i < holesNumber;  i++)
+		for (int x = 0; x < worldSizeX; x++)
+		{
+			for (int z = 0; z < worldSizeZ; z++)
+			{
+				Vector3 pos = new Vector3(x * gridOffset, transform.position.y, z * gridOffset);
+
+				if (blocksGrid[x, z] == 2)
+				{
+					GameObject newHole = Instantiate(hole, pos, Quaternion.identity);
+					blockPositions.Add(newHole.transform.position);
+					blocks.Add(newHole);
+					newHole.transform.SetParent(this.transform);
+				}
+			}
+		}
+
+		/*for (int i = 0; i < holesNumber;  i++)
         {
 			int randomIndex = Random.Range(0, blocks.Count);
 
@@ -78,8 +143,8 @@ public class ProcedualMapGeneration : MonoBehaviour
 			blockPositions.RemoveAt(randomIndex);
 			Destroy(blocks[randomIndex].gameObject);
 			blocks.RemoveAt(randomIndex);
-		}
-		
+		}*/
+
 	}
 
     async Task SpawnOuterWalls()
@@ -145,7 +210,43 @@ public class ProcedualMapGeneration : MonoBehaviour
 		{
 			for (int z = 0; z < worldSizeZ; z++)
 			{
-				blocksGrid[x, z] = 1;
+				//set holes
+				int random = Random.Range(1, 101); 
+				if (x < worldSizeX -1 && x != 0 && z < worldSizeZ -1 && z != 0)
+				{
+					if (random < holeSpawnPercent)
+					{
+						for (int i = 0; i < holeLength; i++)
+						{
+							if (z + i < worldSizeZ)
+							{
+								blocksGrid[x, z + i] = 2;
+							}
+						}
+					}
+
+					//set floor
+					else
+					{
+						if (blocksGrid[x,z] == 0)
+						{
+							blocksGrid[x, z] = 1;
+						}
+					}
+					
+				}
+				//set floor
+				else
+				{
+					blocksGrid[x, z] = 1;
+				}
+
+				//set inner walls
+				if (blocksGrid[x,z] == 1)
+				{
+					blocksGrid[x,z] = 3;
+				}
+
 			}
 		}
 	}
