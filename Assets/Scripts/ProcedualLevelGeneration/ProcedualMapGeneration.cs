@@ -4,10 +4,6 @@ using UnityEngine;
 
 public class ProcedualMapGeneration : MonoBehaviour
 {
-	[SerializeField] MazeCreator mazeCreator;
-
-
-
 	public GameObject blockGameObject;
     public Transform wallToSpawn;
     public GameObject outerWall;
@@ -16,7 +12,7 @@ public class ProcedualMapGeneration : MonoBehaviour
     private int worldSizeX = 10;
     private int worldSizeZ = 10;
 
-    private int gridOffset = 4;
+    private int CellSize = 3;
 
     private List<Vector3> blockPositions = new List<Vector3>();
     private List<GameObject> blocks = new List<GameObject>();
@@ -26,72 +22,25 @@ public class ProcedualMapGeneration : MonoBehaviour
 	[SerializeField] int holeSpawnPercent = 10;
 	[SerializeField] int holeLength = 5;
 
+	MazeRenderer mazeRenderer;
 
     private int holesNumber = 4;
 
     void Start()
     {
-		
-
-		InitiateGrid();
-	
+		mazeRenderer = GetComponent<MazeRenderer>();
+		InitiateGrid();	
 		SrartGeneration();
-
 	}
     async void SrartGeneration()
     {
-		SpawnFloor();
-		await SpawnOuterWalls();
-		SpawnHoles();
 		SpawnWall();
 	}
     private void SpawnWall()
     {
-		var maze = MazeGenerator.Generate(worldSizeX, worldSizeZ);
-
-		for (int x = 0; x < worldSizeX; x++)
-		{
-			for (int z = 0; z < worldSizeZ; z++)
-			{
-				Vector3 pos = new Vector3(x * gridOffset, transform.position.y, z * gridOffset);
-
-
-				if (blocksGrid[x, z] == 3)
-				{
-
-					mazeCreator.Create(maze[x,z], pos, wallToSpawn);
-
-					GameObject block = Instantiate(blockGameObject, pos, Quaternion.identity);
-					blockPositions.Add(block.transform.position);
-					blocks.Add(block);
-
-					block.transform.SetParent(this.transform);
-				}
-			}
-		}
-
-
-
-
-
-		/*for (int x = 0; x < worldSizeX; x++)
-		{
-			for (int z = 0; z < worldSizeZ; z++)
-			{
-				Vector3 pos = new Vector3(x * gridOffset, transform.position.y, z * gridOffset);
-
-				if (blocksGrid[x, z] == 3)
-				{
-					GameObject wall = Instantiate(wallToSpawn, pos, Quaternion.identity);
-
-					GameObject block = Instantiate(blockGameObject, pos, Quaternion.identity);
-					blockPositions.Add(block.transform.position);
-					blocks.Add(block);
-
-					block.transform.SetParent(this.transform);
-				}
-			}
-		}*/
+		var mazeGenerator = new MazeGenerator(worldSizeX, worldSizeZ);
+		NewMazeCell[,] maze = mazeGenerator.GetMaze();
+		mazeRenderer.RenderWalls(maze, worldSizeX, worldSizeZ, CellSize);
 	}
 
 	private Vector3 ObjectSpawnLocation()
@@ -108,7 +57,7 @@ public class ProcedualMapGeneration : MonoBehaviour
 		{
 			for (int z = 0; z < worldSizeZ; z++)
 			{
-				Vector3 pos = new Vector3(x * gridOffset, transform.position.y, z * gridOffset);
+				Vector3 pos = new Vector3(x * CellSize, transform.position.y, z * CellSize);
 
 				if (blocksGrid[x, z] == 2)
 				{
@@ -119,32 +68,6 @@ public class ProcedualMapGeneration : MonoBehaviour
 				}
 			}
 		}
-
-		/*for (int i = 0; i < holesNumber;  i++)
-        {
-			int randomIndex = Random.Range(0, blocks.Count);
-
-            while (randomIndex == worldSizeX || randomIndex == worldSizeZ)
-            {
-                randomIndex = Random.Range(0, blocks.Count);
-                await Task.Delay(20);
-			}
-          
-			Instantiate(hole, blocks[randomIndex].transform.position, Quaternion.identity);
-			
-			if (blocks[randomIndex+1] != null) //out of range
-            {
-				Instantiate(hole, blocks[randomIndex + 1].transform.position, Quaternion.identity);
-				blockPositions.RemoveAt(randomIndex + 1);
-				Destroy(blocks[randomIndex + 1].gameObject);
-				blocks.RemoveAt(randomIndex + 1);
-			}
-
-			blockPositions.RemoveAt(randomIndex);
-			Destroy(blocks[randomIndex].gameObject);
-			blocks.RemoveAt(randomIndex);
-		}*/
-
 	}
 
     async Task SpawnOuterWalls()
@@ -157,7 +80,7 @@ public class ProcedualMapGeneration : MonoBehaviour
         {
             for (int z = 0; z < worldSizeZ; z++)
             {
-				Vector3 pos = new Vector3(x * gridOffset, transform.position.y, z * gridOffset);
+				Vector3 pos = new Vector3(x * CellSize, transform.position.y, z * CellSize);
 
 				if (x == 0)
                 {
@@ -188,7 +111,7 @@ public class ProcedualMapGeneration : MonoBehaviour
         {
             for (int z = 0; z < worldSizeZ; z++)
             {
-				Vector3 pos = new Vector3(x * gridOffset, transform.position.y, z * gridOffset);
+				Vector3 pos = new Vector3(x * CellSize, transform.position.y, z * CellSize);
 
 				if (blocksGrid[x, z] == 1)
                 {
