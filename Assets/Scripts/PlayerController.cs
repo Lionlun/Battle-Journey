@@ -4,14 +4,14 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 { //TO DO разделить на отдельные классы
 	public Rigidbody Rb;
-    float speed = 5;
+    float speed = 500;
  
 	[SerializeField]Camera cam;
 	[SerializeField] Reticle reticle;
 	[SerializeField] TouchDetection touchDetection;
 	Animator animator;
 
-	float knockBackForce = 8;
+	float knockBackForce = 250;
 	float jumpForce = 10;
 	float jumpCooldown = 0;
 	float jumpCooldownRefresher = 1f;
@@ -68,15 +68,18 @@ public class PlayerController : MonoBehaviour
 	public void KnockBack(Vector3 objectPosition)
 	{
 		var direction = transform.position - objectPosition;
-		Rb.AddForce(direction * knockBackForce, ForceMode.Impulse);
+		Rb.AddForce(direction * knockBackForce * Time.deltaTime, ForceMode.Force);
 	}
 
 	void GatherSwipeInput(SwipeData data)
 	{
 		var horizontalDirection = data.StartPosition.x - data.EndPosition.x;
 		var verticalDirection = data.StartPosition.y - data.EndPosition.y;
-	
-		var distance = Vector2.Distance(data.StartPosition, data.EndPosition);
+
+
+		var scaledStart = new Vector2(data.StartPosition.x/Screen.width, data.StartPosition.y/Screen.height);
+		var scaledEnd = new Vector2(data.EndPosition.x / Screen.width, data.EndPosition.y / Screen.height);
+		var distance = Vector2.Distance(scaledStart, scaledEnd);
 
 		Move(distance);
 	}
@@ -93,8 +96,13 @@ public class PlayerController : MonoBehaviour
 
     void Move(float distance)
     {
-		
-		Rb.AddForce(transform.forward*speed*distance/1.5f);
+		distance *= 3;
+		Debug.Log(distance);
+		if (distance > 300)
+		{
+			distance = 300;
+		}
+		Rb.AddForce(transform.forward*distance*speed, ForceMode.Force); //distance deleted
 	}
 
 	void ActivateAbility()
@@ -121,6 +129,6 @@ public class PlayerController : MonoBehaviour
 
 	void StopJump()
 	{
-		Rb.AddForce(-transform.up * jumpForce*2, ForceMode.Impulse);
+		Rb.AddForce(-transform.up * jumpForce*2, ForceMode.Force);
 	}
 }
