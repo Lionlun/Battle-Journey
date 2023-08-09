@@ -14,163 +14,74 @@ public class ProcedualMapGeneration : MonoBehaviour
 
     private int CellSize = 3;
 
-    private List<Vector3> blockPositions = new List<Vector3>();
-    private List<GameObject> blocks = new List<GameObject>();
-
-    private byte[,] blocksGrid;
-
-	[SerializeField] int holeSpawnPercent = 10;
+	[SerializeField] int holeSpawnPercent;
 	[SerializeField] int holeLength = 5;
 
 	MazeRenderer mazeRenderer;
 
-    private int holesNumber = 4;
+	NewMazeCell[,] maze;
 
-    void Start()
+	//TODO implement mazeCells
+
+	void Start()
     {
 		mazeRenderer = GetComponent<MazeRenderer>();
-		InitiateGrid();	
+		//InitiateGrid();	
 		SrartGeneration();
 	}
-    async void SrartGeneration()
+	void SrartGeneration()
     {
-		SpawnWall();
+		CreateMaze();
+		ActivateFloor();
+		SpawnHoles();
 	}
-    private void SpawnWall()
+    private void CreateMaze()
     {
 		var mazeGenerator = new MazeGenerator(worldSizeX, worldSizeZ);
-		NewMazeCell[,] maze = mazeGenerator.GetMaze();
+		maze = mazeGenerator.GetMaze();
 		mazeRenderer.RenderWalls(maze, worldSizeX, worldSizeZ, CellSize);
 	}
 
-	private Vector3 ObjectSpawnLocation()
-    {
-        int randomIndex = Random.Range(0, blockPositions.Count);
-
-        Vector3 newPosition = new Vector3(blockPositions[randomIndex].x, blockPositions[randomIndex].y + 2.5f, blockPositions[randomIndex].z);
-        blockPositions.RemoveAt(randomIndex);
-        return newPosition;
-    }
-    async void SpawnHoles()
-    {
+	private void ActivateFloor()
+	{
 		for (int x = 0; x < worldSizeX; x++)
 		{
-			for (int z = 0; z < worldSizeZ; z++)
+			for (int y = 0; y < worldSizeZ; y++)
 			{
-				Vector3 pos = new Vector3(x * CellSize, transform.position.y, z * CellSize);
-
-				if (blocksGrid[x, z] == 2)
-				{
-					GameObject newHole = Instantiate(hole, pos, Quaternion.identity);
-					blockPositions.Add(newHole.transform.position);
-					blocks.Add(newHole);
-					newHole.transform.SetParent(this.transform);
-				}
+				mazeRenderer.Cells[new Vector2Int(x, y)].ActivateFloor();
 			}
 		}
 	}
 
-    async Task SpawnOuterWalls()
-    {
-		Quaternion spawnRotation90 = Quaternion.Euler(0, 90, 0);
-		Quaternion spawnRotationMinus90 = Quaternion.Euler(0, -90, 0);
-        Quaternion spawnRotation180 = Quaternion.Euler(0, 180, 0);
 
-		for (int x = 0; x < worldSizeX; x++)
-        {
-            for (int z = 0; z < worldSizeZ; z++)
-            {
-				Vector3 pos = new Vector3(x * CellSize, transform.position.y, z * CellSize);
-
-				if (x == 0)
-                {
-					Instantiate(outerWall, pos, Quaternion.identity);
-				}
-
-				if (x == worldSizeX-1)
-				{
-					Instantiate(outerWall, pos, spawnRotation180);
-				}
-
-				if (z == 0)
-				{
-					Instantiate(outerWall, pos, spawnRotationMinus90 );
-				}
-				if (z == worldSizeZ-1)
-				{
-					Instantiate(outerWall, pos, spawnRotation90);
-				}
-			}
-		}
-        await Task.Yield();
-    }
-
-    void SpawnFloor()
-    {
-        for (int x = 0; x < worldSizeX; x++)
-        {
-            for (int z = 0; z < worldSizeZ; z++)
-            {
-				Vector3 pos = new Vector3(x * CellSize, transform.position.y, z * CellSize);
-
-				if (blocksGrid[x, z] == 1)
-                {
-					GameObject block = Instantiate(blockGameObject, pos, Quaternion.identity);
-					blockPositions.Add(block.transform.position);
-					blocks.Add(block);
-
-					block.transform.SetParent(this.transform);
-				}
-            }
-        }
-    }
-
-    void InitiateGrid()
-    {
-		blocksGrid = new byte[worldSizeX, worldSizeZ];
-
+	private void SpawnHoles()
+	{
 		for (int x = 0; x < worldSizeX; x++)
 		{
-			for (int z = 0; z < worldSizeZ; z++)
+			for (int y = 0; y < worldSizeZ; y++)
 			{
-				//set holes
-				int random = Random.Range(1, 101); 
-				if (x < worldSizeX -1 && x != 0 && z < worldSizeZ -1 && z != 0)
+				var random = Random.Range(0, 101);
+
+				if (random <= holeSpawnPercent)
 				{
-					if (random < holeSpawnPercent)
+					if (maze[x, y].X + 1 < worldSizeX)
 					{
-						for (int i = 0; i < holeLength; i++)
+						if (maze[x, y].LeftWall == true && maze[x + 1, y].LeftWall == true)
 						{
-							if (z + i < worldSizeZ)
-							{
-								blocksGrid[x, z + i] = 2;
-							}
+							mazeRenderer.Cells[new Vector2Int(x, y)].DeactivateFloor();
 						}
 					}
 
-					//set floor
-					else
+					if (maze[x, y].Y - 1 >= 0)
 					{
-						if (blocksGrid[x,z] == 0)
+						if (maze[x, y].TopWall == true && maze[x, y - 1].TopWall == true)
 						{
-							blocksGrid[x, z] = 1;
+							mazeRenderer.Cells[new Vector2Int(x, y)].DeactivateFloor();
 						}
 					}
-					
 				}
-				//set floor
-				else
-				{
-					blocksGrid[x, z] = 1;
-				}
-
-				//set inner walls
-				if (blocksGrid[x,z] == 1)
-				{
-					blocksGrid[x,z] = 3;
-				}
-
 			}
 		}
+			
 	}
 }

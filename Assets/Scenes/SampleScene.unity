@@ -2087,7 +2087,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b1268246ee141434d8a644b59ac5626d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mazeCreator: {fileID: 331495841}
   blockGameObject: {fileID: 3715377389320621339, guid: 3258539d8cdfd3945a199dbf886472bf,
     type: 3}
   wallToSpawn: {fileID: 3859365513181134829, guid: 47e345b2c51b8374490d03b784a491af,
@@ -2095,7 +2094,7 @@ MonoBehaviour:
   outerWall: {fileID: 8228499940348335620, guid: 61601570c9e415e4eb9e39fb695e0f81,
     type: 3}
   hole: {fileID: 8783908828905488341, guid: a4a1018c984bc9a4eb6b51eecb2a6476, type: 3}
-  holeSpawnPercent: 10
+  holeSpawnPercent: 40
   holeLength: 3
 --- !u!4 &1187507514
 Transform:
@@ -2126,7 +2125,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mazeCellPrefab: {fileID: 1596639991136850741, guid: 0018afb43b57a9c4a99548ddcfe13027,
     type: 3}
-  CellSize: 3
+  absentWallSpawnPercent: 10
 --- !u!1 &1227911903
 GameObject:
   m_ObjectHideFlags: 0
@@ -3035,7 +3034,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mazeCellPrefab: {fileID: 1596639991136850741, guid: 0018afb43b57a9c4a99548ddcfe13027,
     type: 3}
-  CellSize: 3
+  absentWallSpawnPercent: 10
 --- !u!4 &1704661348
 Transform:
   m_ObjectHideFlags: 0
