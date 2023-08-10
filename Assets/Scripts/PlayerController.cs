@@ -73,11 +73,7 @@ public class PlayerController : MonoBehaviour
 
 	void GatherSwipeInput(SwipeData data)
 	{
-		var horizontalDirection = data.StartPosition.x - data.EndPosition.x;
-		var verticalDirection = data.StartPosition.y - data.EndPosition.y;
-
-
-		var scaledStart = new Vector2(data.StartPosition.x/Screen.width, data.StartPosition.y/Screen.height);
+		var scaledStart = new Vector2(data.StartPosition.x/Screen.width, data.StartPosition.y/Screen.height); //TODO возможно заскейлить distance раньше
 		var scaledEnd = new Vector2(data.EndPosition.x / Screen.width, data.EndPosition.y / Screen.height);
 		var distance = Vector2.Distance(scaledStart, scaledEnd);
 
@@ -98,11 +94,11 @@ public class PlayerController : MonoBehaviour
     {
 		distance *= 3;
 		Debug.Log(distance);
-		if (distance > 300)
+		if (distance > 3)
 		{
-			distance = 300;
+			distance = 3;
 		}
-		Rb.AddForce(transform.forward*distance*speed, ForceMode.Force); //distance deleted
+		Rb.AddForce(transform.forward*distance*speed, ForceMode.Force);
 	}
 
 	void ActivateAbility()

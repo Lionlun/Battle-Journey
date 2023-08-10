@@ -6,13 +6,15 @@ public class Health : MonoBehaviour
 {
     [SerializeField] int maxHealth = 100;
     [SerializeField] int currentHealth;
-	[SerializeField] float takeDamageCooldownRefresh = 1.5f;
+	[SerializeField] float takeDamageCooldownRefresh = 0.5f;
 	float takeDamageCooldown = 0;
+    IHealthUI objectHealthtUI;
 	
 
 	void Start()
     {
         currentHealth = maxHealth;
+		objectHealthtUI = GetComponent<IHealthUI>();
 	}
 
 	private void Update()
@@ -24,14 +26,25 @@ public class Health : MonoBehaviour
 
         RefreshTakeDamageCooldown();
 	}
+	public int ReturnHealth()
+	{
+		return currentHealth;
+	}
+
 	public void TakeDamage(int damage)
     {
         if (takeDamageCooldown <= 0)
         {
 			currentHealth -= damage;
             takeDamageCooldown = takeDamageCooldownRefresh;
+            objectHealthtUI.ShowTakeDamage();
 		}
-    }
+
+		if (currentHealth < 0)
+		{
+			currentHealth = 0;
+		}
+	}
 
     public void GetHealth(int health)
     {
@@ -49,9 +62,9 @@ public class Health : MonoBehaviour
 
     private void RefreshTakeDamageCooldown()
     {
-		if (currentHealth < 0)
+		if (takeDamageCooldown > 0)
 		{
-			currentHealth = 0;
+			takeDamageCooldown -= Time.deltaTime;
 		}
 	}
 }
