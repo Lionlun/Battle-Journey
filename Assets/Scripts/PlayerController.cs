@@ -4,7 +4,7 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 { //TO DO разделить на отдельные классы
 	public Rigidbody Rb;
-    float speed = 500;
+    float speed = 700;
  
 	[SerializeField]Camera cam;
 	[SerializeField] Reticle reticle;
@@ -16,6 +16,7 @@ public class PlayerController : MonoBehaviour
 	float jumpCooldown = 0;
 	float jumpCooldownRefresher = 1f;
 
+	bool isHoldingStill;
 	bool isHolding;
 
 	private void OnEnable()
@@ -25,6 +26,8 @@ public class PlayerController : MonoBehaviour
 		InputEvents.OnDoubleTap += StopJump;
 		InputEvents.OnTap += Jump;
 		InputEvents.OnHold += AccumulateForce;
+		InputEvents.OnTouch += TurnHoldOn;
+		InputEvents.OnEndTouch += TurnHoldOff;
 	}
 	private void OnDisable()
 	{
@@ -33,6 +36,8 @@ public class PlayerController : MonoBehaviour
 		InputEvents.OnDoubleTap -= StopJump;
 		InputEvents.OnTap -= Jump;
 		InputEvents.OnHold -= AccumulateForce;
+		InputEvents.OnTouch -= TurnHoldOn;
+		InputEvents.OnEndTouch -= TurnHoldOff;
 
 	}
 	private void Start()
@@ -49,7 +54,7 @@ public class PlayerController : MonoBehaviour
 		}
 		animator.SetFloat("Speed", Rb.velocity.magnitude);
 
-		if (isHolding)
+		if (isHoldingStill)
 		{
 			Debug.Log("Accumulate FORCE");
 		}
@@ -82,7 +87,7 @@ public class PlayerController : MonoBehaviour
 
 	void Rotate()
     {
-		if (touchDetection.CurrentDirection != Vector3.zero)
+		if (touchDetection.CurrentDirection != Vector3.zero && isHolding)
 		{
 			var relative = (transform.position + touchDetection.CurrentDirection.ToIso()) - transform.position;
 			var rot = Quaternion.LookRotation(relative, Vector2.up);
@@ -108,8 +113,7 @@ public class PlayerController : MonoBehaviour
 
 	void AccumulateForce(bool isHolding)
 	{
-		this.isHolding = isHolding;
-		Debug.Log("Acumulating force");
+		this.isHoldingStill = isHolding;
 	}
 
 	void Jump()
@@ -122,9 +126,17 @@ public class PlayerController : MonoBehaviour
 		}
 		
 	}
-
 	void StopJump()
 	{
 		Rb.AddForce(-transform.up * jumpForce*2, ForceMode.Force);
+	}
+
+	void TurnHoldOn()
+	{
+		isHolding = true;
+	}
+	void TurnHoldOff()
+	{
+		isHolding = false;
 	}
 }

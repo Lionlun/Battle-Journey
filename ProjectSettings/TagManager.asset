@@ -7,6 +7,7 @@ TagManager:
   - Blade
   - Handle
   - Enemy
+  - Wall
   layers:
   - Default
   - TransparentFX
@@ -20,8 +21,8 @@ TagManager:
   - Target
   - AttackRange
   - Enemy
-  - 
-  - 
+  - Fade
+  - Floor
   - 
   - 
   - 
