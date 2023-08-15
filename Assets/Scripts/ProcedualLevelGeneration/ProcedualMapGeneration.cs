@@ -12,7 +12,7 @@ public class ProcedualMapGeneration : MonoBehaviour
     private int worldSizeX = 10;
     private int worldSizeZ = 10;
 
-    private int CellSize = 3;
+    private int CellSize = 5;
 
 	[SerializeField] int holeSpawnPercent;
 	[SerializeField] int holeLength = 5;
@@ -69,6 +69,7 @@ public class ProcedualMapGeneration : MonoBehaviour
 						if (maze[x, y].LeftWall == true && maze[x + 1, y].LeftWall == true)
 						{
 							mazeRenderer.Cells[new Vector2Int(x, y)].DeactivateFloor();
+							Instantiate(hole, mazeRenderer.Cells[new Vector2Int(x, y)].transform.position, Quaternion.identity);
 						}
 					}
 
@@ -77,6 +78,7 @@ public class ProcedualMapGeneration : MonoBehaviour
 						if (maze[x, y].TopWall == true && maze[x, y - 1].TopWall == true)
 						{
 							mazeRenderer.Cells[new Vector2Int(x, y)].DeactivateFloor();
+							Instantiate(hole, mazeRenderer.Cells[new Vector2Int(x, y)].transform.position, Quaternion.identity);
 						}
 					}
 				}

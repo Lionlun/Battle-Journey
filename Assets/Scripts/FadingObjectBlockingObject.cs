@@ -6,7 +6,7 @@ public class FadingObjectBlockingObject : MonoBehaviour
 {
 	[SerializeField] private LayerMask layerMask;
 	[SerializeField] private Transform target;
-	[SerializeField] private Camera cam;
+	private Camera cam;
 	[SerializeField] private float FadeAlpha = 0.33f;
 	[SerializeField] private bool retainShadows = true;
 	[SerializeField] private Vector3 targetPositionOffset = Vector3.up;
@@ -19,6 +19,7 @@ public class FadingObjectBlockingObject : MonoBehaviour
 
 	private void Start()
 	{
+		cam = Camera.main;
 		StartCoroutine(CheckForObjects());
 	}
 

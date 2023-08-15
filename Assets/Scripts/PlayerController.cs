@@ -1,10 +1,11 @@
 
+using System.Threading.Tasks;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
-{ //TO DO разделить на отдельные классы
-	public Rigidbody Rb;
-    float speed = 700;
+{ //TO DO СЂР°Р·РґРµР»РёС‚СЊ РЅР° РѕС‚РґРµР»СЊРЅС‹Рµ РєР»Р°СЃСЃС‹
+	[HideInInspector] public Rigidbody Rb;
+    [SerializeField] float speed = 10;
  
 	[SerializeField]Camera cam;
 	[SerializeField] Reticle reticle;
@@ -78,7 +79,7 @@ public class PlayerController : MonoBehaviour
 
 	void GatherSwipeInput(SwipeData data)
 	{
-		var scaledStart = new Vector2(data.StartPosition.x/Screen.width, data.StartPosition.y/Screen.height); //TODO возможно заскейлить distance раньше
+		var scaledStart = new Vector2(data.StartPosition.x/Screen.width, data.StartPosition.y/Screen.height); //TODO РІРѕР·РјРѕР¶РЅРѕ Р·Р°СЃРєРµР№Р»РёС‚СЊ distance СЂР°РЅСЊС€Рµ
 		var scaledEnd = new Vector2(data.EndPosition.x / Screen.width, data.EndPosition.y / Screen.height);
 		var distance = Vector2.Distance(scaledStart, scaledEnd);
 
@@ -95,15 +96,37 @@ public class PlayerController : MonoBehaviour
 		}
 	}
 
-    void Move(float distance)
-    {
+
+	async void Move(float distance)
+	{
+		var smoothedDistance = SmoothDistance(distance);
+
+		var ticks = 0;
+
+		Vector3 velocity = transform.forward * smoothedDistance * speed / 1.2f;
+
+		while (ticks <= 8)
+		{
+			Rb.velocity = velocity;
+			ticks++;
+			await Task.Delay(50);
+		}
+	}
+
+
+	float SmoothDistance(float distance)
+	{
 		distance *= 3;
-		Debug.Log(distance);
+
 		if (distance > 3)
 		{
 			distance = 3;
 		}
-		Rb.AddForce(transform.forward*distance*speed, ForceMode.Force);
+		if (distance < 0.3f)
+		{
+			distance = 0.35f;
+		}
+		return distance;
 	}
 
 	void ActivateAbility()
