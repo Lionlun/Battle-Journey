@@ -5,9 +5,9 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 { //TO DO разделить на отдельные классы
 	[HideInInspector] public Rigidbody Rb;
-    [SerializeField] float speed = 10;
+    [SerializeField] float speed = 15;
  
-	[SerializeField]Camera cam;
+	[SerializeField] Camera cam;
 	[SerializeField] Reticle reticle;
 	[SerializeField] TouchDetection touchDetection;
 	Animator animator;
@@ -79,7 +79,7 @@ public class PlayerController : MonoBehaviour
 
 	void GatherSwipeInput(SwipeData data)
 	{
-		var scaledStart = new Vector2(data.StartPosition.x/Screen.width, data.StartPosition.y/Screen.height); //TODO возможно заскейлить distance раньше
+		var scaledStart = new Vector2(data.StartPosition.x / Screen.width, data.StartPosition.y / Screen.height); //TODO возможно заскейлить distance раньше
 		var scaledEnd = new Vector2(data.EndPosition.x / Screen.width, data.EndPosition.y / Screen.height);
 		var distance = Vector2.Distance(scaledStart, scaledEnd);
 
@@ -96,21 +96,12 @@ public class PlayerController : MonoBehaviour
 		}
 	}
 
-
 	async void Move(float distance)
 	{
 		var smoothedDistance = SmoothDistance(distance);
-
-		var ticks = 0;
-
-		Vector3 velocity = transform.forward * smoothedDistance * speed / 1.2f;
-
-		while (ticks <= 8)
-		{
-			Rb.velocity = velocity;
-			ticks++;
-			await Task.Delay(50);
-		}
+		Vector3 velocity = transform.forward * smoothedDistance * speed;
+		Rb.velocity = velocity;
+		await Task.Delay(10);
 	}
 
 

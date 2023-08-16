@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
 public class PlayerWallJump : MonoBehaviour
@@ -27,10 +28,11 @@ public class PlayerWallJump : MonoBehaviour
 		{
 			currentSpeed = lastVelocity.magnitude;
 			direction = Vector3.Reflect(lastVelocity.normalized, collision.contacts[0].normal);
-			Quaternion rotation = Quaternion.LookRotation(direction, Vector3.up);
+			Quaternion rotation = Quaternion.LookRotation(new Vector3(direction.x, 0, direction.z), Vector3.up);
+			rb.velocity = new Vector3(direction.x, 0, direction.z) * Mathf.Max(currentSpeed, 0);
+			rb.velocity += new Vector3(0, 7, 0);
 			transform.rotation = rotation;
-			rb.velocity = direction*Mathf.Max(currentSpeed, 0);
-			currenJumps++;
+			//currenJumps++;
 		}
 	}
 }

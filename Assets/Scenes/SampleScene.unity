@@ -992,13 +992,13 @@ Light:
   m_Type: 3
   m_Shape: 0
   m_Color: {r: 1, g: 0.93798894, b: 0.7688679, a: 1}
-  m_Intensity: 1
+  m_Intensity: 7.49
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
   m_CookieSize: 10
   m_Shadows:
-    m_Type: 0
+    m_Type: 2
     m_Resolution: -1
     m_CustomResolution: -1
     m_Strength: 1
@@ -1050,7 +1050,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 705507993}
   m_LocalRotation: {x: 0.40821788, y: -0.23456968, z: 0.10938163, w: 0.8754261}
-  m_LocalPosition: {x: -0.85, y: 4.91, z: 5.11}
+  m_LocalPosition: {x: 16, y: 17.83, z: 8.75}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1411,6 +1411,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 1756447649}
+  touchDetection: {fileID: 1538880567}
 --- !u!1 &1137068026
 GameObject:
   m_ObjectHideFlags: 0
@@ -2617,8 +2618,8 @@ Rigidbody:
   m_AngularDrag: 0.01
   m_UseGravity: 1
   m_IsKinematic: 0
-  m_Interpolate: 0
-  m_Constraints: 80
+  m_Interpolate: 2
+  m_Constraints: 112
   m_CollisionDetection: 0
 --- !u!65 &1756447647
 BoxCollider:
@@ -2627,7 +2628,7 @@ BoxCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1756447642}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 328a63483491f8c4ab9aff407c57daca, type: 2}
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
