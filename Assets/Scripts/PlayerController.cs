@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 { //TO DO разделить на отдельные классы
+
+	public bool IsStuck;
 	[HideInInspector] public Rigidbody Rb;
     [SerializeField] float speed = 15;
  
@@ -74,7 +76,21 @@ public class PlayerController : MonoBehaviour
 	public void KnockBack(Vector3 objectPosition)
 	{
 		var direction = transform.position - objectPosition;
-		Rb.AddForce(direction * knockBackForce * Time.deltaTime, ForceMode.Force);
+		Rb.AddForce(direction * knockBackForce, ForceMode.Force);
+	}
+
+	public void Stuck(Transform enemyTransform)
+	{
+		var direction = enemyTransform.position - transform.position;
+		transform.position += direction.normalized/2;
+		Rb.isKinematic = true;
+		IsStuck = true;
+	}
+	public void Unstuck()
+	{
+		Rb.velocity += -transform.forward * 2;
+		Rb.isKinematic = false;
+		IsStuck = false;
 	}
 
 	void GatherSwipeInput(SwipeData data)
@@ -88,7 +104,7 @@ public class PlayerController : MonoBehaviour
 
 	void Rotate()
     {
-		if (touchDetection.CurrentDirection != Vector3.zero && isHolding)
+		if (touchDetection.CurrentDirection != Vector3.zero && isHolding && !IsStuck)
 		{
 			var relative = (transform.position + touchDetection.CurrentDirection.ToIso()) - transform.position;
 			var rot = Quaternion.LookRotation(relative, Vector2.up);
@@ -98,10 +114,17 @@ public class PlayerController : MonoBehaviour
 
 	async void Move(float distance)
 	{
-		var smoothedDistance = SmoothDistance(distance);
-		Vector3 velocity = transform.forward * smoothedDistance * speed;
-		Rb.velocity = velocity;
-		await Task.Delay(10);
+		if (!IsStuck)
+		{
+			var smoothedDistance = SmoothDistance(distance);
+			Vector3 velocity = transform.forward * smoothedDistance * speed;
+			Rb.velocity = velocity;
+			await Task.Delay(10);
+		}
+		else
+		{
+			Unstuck();
+		}
 	}
 
 
@@ -135,7 +158,6 @@ public class PlayerController : MonoBehaviour
 		if (jumpCooldown <= 0)
 		{
 			Rb.AddForce(transform.up * jumpForce, ForceMode.Impulse);
-			Debug.Log("Jump");
 			jumpCooldown = jumpCooldownRefresher;
 		}
 		
