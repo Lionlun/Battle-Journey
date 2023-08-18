@@ -6,20 +6,16 @@ using UnityEngine;
 public class RepositoriesBase
 {
 	private Dictionary<Type, Repository> repositoriesMap;
-	public RepositoriesBase()
+	private SceneConfig sceneConfig;
+
+	public RepositoriesBase(SceneConfig sceneConfig)
 	{
-		this.repositoriesMap = new Dictionary<Type, Repository>();
+		this.sceneConfig = sceneConfig;
 	}
 
 	public void CreateAllRepositories()
 	{
-		this.CreateRepository<BankRepository>();
-	}
-	private void CreateRepository<T>() where T : Repository, new()
-	{
-		var repository = new T();
-		var type = typeof(T);
-		this.repositoriesMap[type] = repository;
+		this.repositoriesMap = this.sceneConfig.CreateAllRepositories();
 	}
 
 	public void SendOnCreateToAllRepositories()

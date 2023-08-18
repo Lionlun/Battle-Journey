@@ -7,7 +7,7 @@ public class BankInteractor : Interactor
 	public override void OnCreate()
 	{
 		base.OnCreate();
-		this.repository = ArchitectureTest.repositoriesBase.GetRepository<BankRepository>();
+		this.repository = ArchitectureTest.sceneManager.GetRepository<BankRepository>();
 	}
 
 	public override void Initialize()

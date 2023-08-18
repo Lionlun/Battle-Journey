@@ -6,20 +6,15 @@ using UnityEngine;
 public class InteractorsBase
 {
     private Dictionary<Type, Interactor> interactorsMap;
-    public InteractorsBase()
+    private SceneConfig sceneConfig;
+    public InteractorsBase(SceneConfig sceneConfig)
     {
-        this.interactorsMap = new Dictionary<Type, Interactor>();
+        this.sceneConfig = sceneConfig;
     }
 
     public void CreateAllInteractors()
     {
-        this.CreateInteractor<BankInteractor>();
-    }
-    private void CreateInteractor<T>() where T : Interactor, new()
-    {
-        var interactor = new T();
-        var type = typeof(T);
-        this.interactorsMap[type] = interactor;
+        this.interactorsMap = this.sceneConfig.CreateAllInteractors();
     }
 
     public void SendOnCreateToAllInteractors()
