@@ -17,7 +17,7 @@ public class Health : MonoBehaviour
 		objectHealthtUI = GetComponent<IHealthUI>();
 	}
 
-	private void Update()
+	void Update()
 	{
 		if (currentHealth <= 0)
 		{
@@ -60,7 +60,7 @@ public class Health : MonoBehaviour
         Destroy(gameObject);
     }
 
-    private void RefreshTakeDamageCooldown()
+    void RefreshTakeDamageCooldown()
     {
 		if (takeDamageCooldown > 0)
 		{

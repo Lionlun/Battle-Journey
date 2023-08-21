@@ -2,13 +2,18 @@ using UnityEngine;
 
 public class HoldDetection : MonoBehaviour
 {
-	private Vector2 fingerDownPosition;
 	public Vector2 fingerCurrentPosition;
-	private float distance = 0;
+	Vector2 fingerDownPosition;
+	float distance = 0;
 	bool isHolding;
 
    void Update()
     {
+		HandleHold();
+	}
+
+	void HandleHold()
+	{
 		foreach (Touch touch in Input.touches)
 		{
 			if (touch.phase == UnityEngine.TouchPhase.Began)

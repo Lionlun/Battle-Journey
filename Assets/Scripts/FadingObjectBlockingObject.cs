@@ -4,26 +4,33 @@ using UnityEngine;
 
 public class FadingObjectBlockingObject : MonoBehaviour
 {
-	[SerializeField] private LayerMask layerMask;
-	[SerializeField] private Transform target;
-	private Camera cam;
-	[SerializeField] private float FadeAlpha = 0.33f;
-	[SerializeField] private bool retainShadows = true;
-	[SerializeField] private Vector3 targetPositionOffset = Vector3.up;
-	[SerializeField] private float fadeSpeed = 1;
+	[SerializeField] LayerMask layerMask;
+	[SerializeField] Transform target;
+	[SerializeField] float FadeAlpha = 0.33f;
+	[SerializeField] bool retainShadows = true;
+	[SerializeField] Vector3 targetPositionOffset = Vector3.up;
+	[SerializeField] float fadeSpeed = 1;
+
+	Camera cam;
 
 	[Header("Read Only Data")]
 	[SerializeField] private List<FadingObject> objectsBlockingView = new List<FadingObject>();
-	private Dictionary<FadingObject, Coroutine> runningCoroutines = new Dictionary<FadingObject, Coroutine>();
-	private RaycastHit[] hits = new RaycastHit[10];
+	Dictionary<FadingObject, Coroutine> runningCoroutines = new Dictionary<FadingObject, Coroutine>();
+	RaycastHit[] hits = new RaycastHit[10];
 
-	private void Start()
+	void Start()
 	{
 		cam = Camera.main;
 		StartCoroutine(CheckForObjects());
 	}
 
-	private IEnumerator CheckForObjects()
+	public enum FadeMode
+	{
+		Transparent,
+		Fade
+	}
+
+	IEnumerator CheckForObjects()
 	{
 		while (true)
 		{
@@ -61,7 +68,7 @@ public class FadingObjectBlockingObject : MonoBehaviour
 		}
 	}
 
-	private IEnumerator FadeObjectOut(FadingObject fadingObject) 
+	IEnumerator FadeObjectOut(FadingObject fadingObject) 
 	{
 		foreach (Material material in fadingObject.Materials)
 		{
@@ -105,7 +112,7 @@ public class FadingObjectBlockingObject : MonoBehaviour
 		}
 	}
 
-	private IEnumerator FadeObjectIn(FadingObject fadingObject)
+	IEnumerator FadeObjectIn(FadingObject fadingObject)
 	{
 		float time = 0;
 
@@ -151,7 +158,7 @@ public class FadingObjectBlockingObject : MonoBehaviour
 	}
 
 
-	private void FadeObjectsNoLongerBeingHit()
+	void FadeObjectsNoLongerBeingHit()
 	{
 		List<FadingObject> objectsToRemove = new List<FadingObject>(objectsBlockingView.Count);
 		foreach (FadingObject obj in objectsBlockingView)
@@ -189,19 +196,13 @@ public class FadingObjectBlockingObject : MonoBehaviour
 		}
 	}
 
-	private FadingObject GetFadingObjectFromHit(RaycastHit hit)
+	FadingObject GetFadingObjectFromHit(RaycastHit hit)
 	{
 		return hit.collider != null ? hit.collider.GetComponent<FadingObject>() : null;
 	}
 
-	private void ClearHits()
+	void ClearHits()
 	{
 		System.Array.Clear(hits, 0, hits.Length);
-	}
-
-	public enum FadeMode
-	{
-		Transparent,
-		Fade
 	}
 }

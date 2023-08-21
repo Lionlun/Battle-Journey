@@ -27,7 +27,6 @@ public class PlayerController : MonoBehaviour
 		InputEvents.OnSwipe += GatherSwipeInput;
 		InputEvents.OnDoubleTap += ActivateAbility;
 		InputEvents.OnDoubleTap += StopJump;
-		InputEvents.OnTap += Jump;
 		InputEvents.OnHold += AccumulateForce;
 		InputEvents.OnTouch += TurnHoldOn;
 		InputEvents.OnEndTouch += TurnHoldOff;
@@ -37,7 +36,6 @@ public class PlayerController : MonoBehaviour
 		InputEvents.OnSwipe -= GatherSwipeInput;
 		InputEvents.OnDoubleTap -= ActivateAbility;
 		InputEvents.OnDoubleTap -= StopJump;
-		InputEvents.OnTap -= Jump;
 		InputEvents.OnHold -= AccumulateForce;
 		InputEvents.OnTouch -= TurnHoldOn;
 		InputEvents.OnEndTouch -= TurnHoldOff;
@@ -153,7 +151,10 @@ public class PlayerController : MonoBehaviour
 		this.isHoldingStill = isHolding;
 	}
 
-	void Jump()
+
+
+	/*
+	 	void Jump()
 	{
 		if (jumpCooldown <= 0)
 		{
@@ -162,6 +163,8 @@ public class PlayerController : MonoBehaviour
 		}
 		
 	}
+	 */
+
 	void StopJump()
 	{
 		Rb.AddForce(-transform.up * jumpForce*2, ForceMode.Force);

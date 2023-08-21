@@ -2,26 +2,26 @@ using UnityEngine;
 
 public class CameraFollow : MonoBehaviour
 {
-	[SerializeField] private Transform target;
+	[SerializeField] Transform target;
 	[SerializeField] TouchDetection touchDetection;
-	private Vector3 cameraInitPosition;
-	private Vector3 cameraAimOffset;
+	Vector3 cameraInitPosition;
+	Vector3 cameraAimOffset;
+	Vector3 velocity = Vector3.zero;
 
-	private float smoothTime = 0.25f;
-    Vector3 velocity = Vector3.zero;
-	private bool isHolding;
-	private float cameraMaxOffset = 0.15f;
-	private float cameraOffsetMultiplier = 20;
+	float smoothTime = 0.25f;
+	float cameraMaxOffset = 0.15f;
+	float cameraOffsetMultiplier = 20;
 
+	bool isHolding;
 
-	private void OnEnable()
+	void OnEnable()
 	{
 		InputEvents.OnTouch += SaveInitPosition;
 		InputEvents.OnEndTouch += ReturnToInitialPosition;
 		InputEvents.OnTouch += HoldOn;
 		InputEvents.OnEndTouch += HoldOff;
 	}
-	private void OnDisable()
+	void OnDisable()
 	{
 		InputEvents.OnTouch -= SaveInitPosition;
 		InputEvents.OnEndTouch -= ReturnToInitialPosition;
