@@ -1,5 +1,6 @@
 
 using System.Threading.Tasks;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
@@ -14,17 +15,19 @@ public class PlayerController : MonoBehaviour
 	[SerializeField] TouchDetection touchDetection;
 	Animator animator;
 
-	float knockBackForce = 250;
 	float jumpForce = 10;
 	float jumpCooldown = 0;
 	float jumpCooldownRefresher = 1f;
+	float kickForce = 6;
 
 	bool isHoldingStill;
 	bool isHolding;
+	public bool IsUnstucking;
 
 	private void OnEnable()
 	{
 		InputEvents.OnSwipe += GatherSwipeInput;
+		InputEvents.OnSwipe += WallUnstuck;
 		InputEvents.OnDoubleTap += ActivateAbility;
 		InputEvents.OnDoubleTap += StopJump;
 		InputEvents.OnHold += AccumulateForce;
@@ -34,6 +37,7 @@ public class PlayerController : MonoBehaviour
 	private void OnDisable()
 	{
 		InputEvents.OnSwipe -= GatherSwipeInput;
+		InputEvents.OnSwipe -= WallUnstuck;
 		InputEvents.OnDoubleTap -= ActivateAbility;
 		InputEvents.OnDoubleTap -= StopJump;
 		InputEvents.OnHold -= AccumulateForce;
@@ -66,15 +70,10 @@ public class PlayerController : MonoBehaviour
 		Rotate();
 	}
 
-	public void Attack()
-	{
-		animator.SetTrigger("Attack");
-	}
-
-	public void KnockBack(Vector3 objectPosition)
+	public void KnockBack(Vector3 objectPosition, float knockbackForce)
 	{
 		var direction = transform.position - objectPosition;
-		Rb.AddForce(direction * knockBackForce, ForceMode.Force);
+		Rb.AddForce(direction * knockbackForce, ForceMode.Force);
 	}
 
 	public void Stuck(Transform enemyTransform)
@@ -84,11 +83,32 @@ public class PlayerController : MonoBehaviour
 		Rb.isKinematic = true;
 		IsStuck = true;
 	}
-	public void Unstuck()
+
+	public async void Unstuck()
 	{
-		Rb.velocity += -transform.forward * 2;
+		Rb.velocity += -transform.forward * 3;
+		await Task.Delay(300);
 		Rb.isKinematic = false;
 		IsStuck = false;
+	}
+	public async void WallUnstuck(SwipeData data)
+	{
+		if (IsStuck)
+		{
+			IsUnstucking = true;
+			Rb.isKinematic = false;
+			IsStuck = false;
+			var scaledStart = new Vector2(data.StartPosition.x / Screen.width, data.StartPosition.y / Screen.height); //TODO возможно заскейлить distance раньше
+			var scaledEnd = new Vector2(data.EndPosition.x / Screen.width, data.EndPosition.y / Screen.height);
+			var distance = Vector2.Distance(scaledStart, scaledEnd);
+
+			var relative = (transform.position + touchDetection.CurrentDirection.ToIso()) - transform.position;
+			Rb.velocity = relative/10;
+			var rot = Quaternion.LookRotation(relative, Vector2.up);
+			transform.rotation = rot;
+			await Task.Delay(200);
+			IsUnstucking = false;
+		}
 	}
 
 	void GatherSwipeInput(SwipeData data)
@@ -118,10 +138,6 @@ public class PlayerController : MonoBehaviour
 			Vector3 velocity = transform.forward * smoothedDistance * speed;
 			Rb.velocity = velocity;
 			await Task.Delay(10);
-		}
-		else
-		{
-			Unstuck();
 		}
 	}
 
@@ -177,5 +193,17 @@ public class PlayerController : MonoBehaviour
 	void TurnHoldOff()
 	{
 		isHolding = false;
+	}
+
+	private void OnTriggerEnter(Collider other)
+	{
+		if(other.gameObject.tag == "Ball")
+		{
+			var ball = other.GetComponent<Ball>();
+			var direction = (other.transform.position - transform.position).normalized;
+			var force = Rb.velocity.magnitude*kickForce;
+			ball.GetKicked(direction, force);
+
+		}
 	}
 }
