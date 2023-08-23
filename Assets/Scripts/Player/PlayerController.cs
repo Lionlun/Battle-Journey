@@ -1,23 +1,17 @@
 
 using System.Threading.Tasks;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 { //TO DO разделить на отдельные классы
 
 	public bool IsStuck;
-	[HideInInspector] public Rigidbody Rb;
+	[HideInInspector] public Rigidbody Rb { get; private set; }
     [SerializeField] float speed = 15;
  
 	[SerializeField] Camera cam;
-	[SerializeField] Reticle reticle;
 	[SerializeField] TouchDetection touchDetection;
-	Animator animator;
 
-	float jumpForce = 10;
-	float jumpCooldown = 0;
-	float jumpCooldownRefresher = 1f;
 	float kickForce = 6;
 
 	bool isHoldingStill;
@@ -26,20 +20,18 @@ public class PlayerController : MonoBehaviour
 
 	private void OnEnable()
 	{
-		InputEvents.OnSwipe += GatherSwipeInput;
+		InputEvents.OnSwipe += Move;
 		InputEvents.OnSwipe += WallUnstuck;
 		InputEvents.OnDoubleTap += ActivateAbility;
-		InputEvents.OnDoubleTap += StopJump;
 		InputEvents.OnHold += AccumulateForce;
 		InputEvents.OnTouch += TurnHoldOn;
 		InputEvents.OnEndTouch += TurnHoldOff;
 	}
 	private void OnDisable()
 	{
-		InputEvents.OnSwipe -= GatherSwipeInput;
+		InputEvents.OnSwipe -= Move;
 		InputEvents.OnSwipe -= WallUnstuck;
 		InputEvents.OnDoubleTap -= ActivateAbility;
-		InputEvents.OnDoubleTap -= StopJump;
 		InputEvents.OnHold -= AccumulateForce;
 		InputEvents.OnTouch -= TurnHoldOn;
 		InputEvents.OnEndTouch -= TurnHoldOff;
@@ -47,18 +39,11 @@ public class PlayerController : MonoBehaviour
 	}
 	private void Start()
 	{
-		animator = GetComponent<Animator>();
 		Rb = GetComponent<Rigidbody>();
 	}
 
 	private void Update()
 	{
-		if (jumpCooldown > 0)
-		{
-			jumpCooldown -= Time.deltaTime;
-		}
-		animator.SetFloat("Speed", Rb.velocity.magnitude);
-
 		if (isHoldingStill)
 		{
 			Debug.Log("Accumulate FORCE");
@@ -70,27 +55,6 @@ public class PlayerController : MonoBehaviour
 		Rotate();
 	}
 
-	public void KnockBack(Vector3 objectPosition, float knockbackForce)
-	{
-		var direction = transform.position - objectPosition;
-		Rb.AddForce(direction * knockbackForce, ForceMode.Force);
-	}
-
-	public void Stuck(Transform enemyTransform)
-	{
-		var direction = enemyTransform.position - transform.position;
-		transform.position += direction.normalized/2;
-		Rb.isKinematic = true;
-		IsStuck = true;
-	}
-
-	public async void Unstuck()
-	{
-		Rb.velocity += -transform.forward * 3;
-		await Task.Delay(300);
-		Rb.isKinematic = false;
-		IsStuck = false;
-	}
 	public async void WallUnstuck(SwipeData data)
 	{
 		if (IsStuck)
@@ -111,13 +75,20 @@ public class PlayerController : MonoBehaviour
 		}
 	}
 
-	void GatherSwipeInput(SwipeData data)
+	public void FreezePlayer()
 	{
-		var scaledStart = new Vector2(data.StartPosition.x / Screen.width, data.StartPosition.y / Screen.height); //TODO возможно заскейлить distance раньше
-		var scaledEnd = new Vector2(data.EndPosition.x / Screen.width, data.EndPosition.y / Screen.height);
-		var distance = Vector2.Distance(scaledStart, scaledEnd);
+		Rb.isKinematic = true;
+		IsStuck = true;
+	}
+	public void UnfreezePlayer() 
+	{
+		Rb.isKinematic = false;
+		IsStuck = false;
+	}
 
-		Move(distance);
+	public void MoveBack()
+	{
+		Rb.velocity += -transform.forward * 3;
 	}
 
 	void Rotate()
@@ -130,8 +101,12 @@ public class PlayerController : MonoBehaviour
 		}
 	}
 
-	async void Move(float distance)
+	async void Move (SwipeData data)
 	{
+		var scaledStart = new Vector2(data.StartPosition.x / Screen.width, data.StartPosition.y / Screen.height); //TODO возможно заскейлить distance раньше
+		var scaledEnd = new Vector2(data.EndPosition.x / Screen.width, data.EndPosition.y / Screen.height);
+		var distance = Vector2.Distance(scaledStart, scaledEnd);
+
 		if (!IsStuck)
 		{
 			var smoothedDistance = SmoothDistance(distance);
@@ -140,7 +115,6 @@ public class PlayerController : MonoBehaviour
 			await Task.Delay(10);
 		}
 	}
-
 
 	float SmoothDistance(float distance)
 	{
@@ -167,25 +141,6 @@ public class PlayerController : MonoBehaviour
 		this.isHoldingStill = isHolding;
 	}
 
-
-
-	/*
-	 	void Jump()
-	{
-		if (jumpCooldown <= 0)
-		{
-			Rb.AddForce(transform.up * jumpForce, ForceMode.Impulse);
-			jumpCooldown = jumpCooldownRefresher;
-		}
-		
-	}
-	 */
-
-	void StopJump()
-	{
-		Rb.AddForce(-transform.up * jumpForce*2, ForceMode.Force);
-	}
-
 	void TurnHoldOn()
 	{
 		isHolding = true;
@@ -203,7 +158,6 @@ public class PlayerController : MonoBehaviour
 			var direction = (other.transform.position - transform.position).normalized;
 			var force = Rb.velocity.magnitude*kickForce;
 			ball.GetKicked(direction, force);
-
 		}
 	}
 }

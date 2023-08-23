@@ -14,7 +14,6 @@ public class Sword : MonoBehaviour
 
 	[SerializeField] PlayerController player;
 
-
 	private void OnEnable()
 	{
 		InputEvents.OnTap += ToggleWeapon;
@@ -61,11 +60,11 @@ public class Sword : MonoBehaviour
 					
 					if (other != null)
 					{
-						player.Stuck(other.gameObject.transform);
+						Stuck(other.gameObject.transform);
 						await Task.Delay(200);
 						enemyHealth.TakeDamage(damage);
 
-						player.Unstuck();
+						Unstuck();
 
 					}
 				}
@@ -75,7 +74,7 @@ public class Sword : MonoBehaviour
 			{
 				if (player.Rb.velocity.magnitude > minimumSpeedToPenetrate && !player.IsUnstucking)
 				{
-					player.Stuck(other.gameObject.transform);
+					Stuck(other.gameObject.transform);
 				}
 			}
 
@@ -92,8 +91,8 @@ public class Sword : MonoBehaviour
 				{
 					knockbackCooldown = knockbackCooldownRefresh;
 					var enemyHealth = other.gameObject.GetComponent<Health>();
-					player.KnockBack(other.transform.position, 250);
-
+					var knockBackComponent = player.gameObject.GetComponent<Knockback>();
+					knockBackComponent.KnockBack(other.transform.position, 250);
 				}
 			}
 
@@ -102,17 +101,30 @@ public class Sword : MonoBehaviour
 				if (player.Rb.velocity.magnitude < minimumSpeedToPenetrate)
 				{
 					var enemyHealth = other.gameObject.GetComponent<Health>();
-					player.KnockBack(other.transform.position, 25);
-
+					var knockBackComponent = player.gameObject.GetComponent<Knockback>();
+					knockBackComponent.KnockBack(other.transform.position, 25);
 				}
 			}
 
 		}
 	}
 
+	public void Stuck(Transform enemyTransform)
+	{
+		var direction = enemyTransform.position - transform.position;
+		transform.position += direction.normalized / 2;
+		player.FreezePlayer();
+	}
+
+	public async void Unstuck()
+	{
+		player.MoveBack();
+		await Task.Delay(300);
+		player.UnfreezePlayer();
+	}
+
 	void ToggleWeapon()
 	{
 		IsUp = !IsUp;
-	
 	}
 }

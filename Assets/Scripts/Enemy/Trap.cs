@@ -15,7 +15,8 @@ public class Trap : MonoBehaviour
 		{
 			var playerRb = other.gameObject.GetComponent<PlayerController>();
 			var playerHealth = other.gameObject.GetComponent<Health>();
-			playerRb.KnockBack(transform.position, 250);
+			var knockBackComponent = other.gameObject.GetComponent<Knockback>();
+			knockBackComponent.KnockBack(other.transform.position, 250);
 			playerHealth.TakeDamage(20);
 		}
 	}

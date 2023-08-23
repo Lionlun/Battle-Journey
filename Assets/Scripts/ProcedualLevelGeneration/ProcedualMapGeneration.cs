@@ -12,7 +12,7 @@ public class ProcedualMapGeneration : MonoBehaviour
     private int worldSizeX = 10;
     private int worldSizeZ = 10;
 
-    private int CellSize = 5;
+    private float CellSize = 3f;
 
 	[SerializeField] int holeSpawnPercent;
 	[SerializeField] int holeLength = 5;
