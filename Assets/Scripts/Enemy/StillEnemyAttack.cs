@@ -1,23 +1,20 @@
-using System.Collections;
-using System.Collections.Generic;
+
 using System.Threading.Tasks;
 using UnityEngine;
 
 public class StillEnemyAttack : MonoBehaviour
 {
-    float attackDamage = 10;
-    float attackCooldown = 2;
-    float rotationSpeed = 5;
-    bool isAttacking;
+    private float attackDamage = 10;
+    private float attackCooldown = 2;
+    private float rotationSpeed = 5;
+    private bool isAttacking;
+    private Animator animator;
 
-
-
-    void Start()
-    {
+	private void Start()
+	{
+		animator = GetComponent<Animator>();
 	}
-
-   
-    void Update()
+	void Update()
     {
         if (attackCooldown > 0)
         {
@@ -41,7 +38,7 @@ public class StillEnemyAttack : MonoBehaviour
         }
 	}
 
-    void RotateTowardsTarget(Vector3 targetPosition)
+    private void RotateTowardsTarget(Vector3 targetPosition)
     {
 		var directionToTraget = targetPosition - transform.position;
 		var vector2Direction = new Vector3(directionToTraget.x, 0, directionToTraget.z);
@@ -49,10 +46,11 @@ public class StillEnemyAttack : MonoBehaviour
 		transform.rotation = Quaternion.LookRotation(newDirection);
 
 	}
-    async void Attack()
+    private async void Attack()
     {
 		Debug.Log("Attack target");
-        await Task.Delay(2000);
+        animator.SetTrigger("Attack");
+		await Task.Delay(2000);
 		attackCooldown = 2;
 		isAttacking = false;
 	}

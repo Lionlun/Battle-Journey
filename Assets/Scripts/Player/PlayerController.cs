@@ -4,50 +4,35 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 { //TO DO разделить на отдельные классы
-
-	public bool IsStuck;
+	public bool IsUnstucking { get; set; }
 	[HideInInspector] public Rigidbody Rb { get; private set; }
-    [SerializeField] float speed = 15;
+
+    [SerializeField] private float speed = 15;
  
-	[SerializeField] Camera cam;
-	[SerializeField] TouchDetection touchDetection;
+	[SerializeField] private TouchDetection touchDetection;
+	Sword sword;
 
-	float kickForce = 6;
-
-	bool isHoldingStill;
-	bool isHolding;
-	public bool IsUnstucking;
+	private bool isHolding;
+	
+	private bool isWallJumping;
 
 	private void OnEnable()
 	{
 		InputEvents.OnSwipe += Move;
-		InputEvents.OnSwipe += WallUnstuck;
-		InputEvents.OnDoubleTap += ActivateAbility;
-		InputEvents.OnHold += AccumulateForce;
 		InputEvents.OnTouch += TurnHoldOn;
 		InputEvents.OnEndTouch += TurnHoldOff;
 	}
 	private void OnDisable()
 	{
 		InputEvents.OnSwipe -= Move;
-		InputEvents.OnSwipe -= WallUnstuck;
-		InputEvents.OnDoubleTap -= ActivateAbility;
-		InputEvents.OnHold -= AccumulateForce;
 		InputEvents.OnTouch -= TurnHoldOn;
 		InputEvents.OnEndTouch -= TurnHoldOff;
 
 	}
 	private void Start()
 	{
+		sword = GetComponentInChildren<Sword>();
 		Rb = GetComponent<Rigidbody>();
-	}
-
-	private void Update()
-	{
-		if (isHoldingStill)
-		{
-			Debug.Log("Accumulate FORCE");
-		}
 	}
 
 	private void FixedUpdate()
@@ -55,35 +40,13 @@ public class PlayerController : MonoBehaviour
 		Rotate();
 	}
 
-	public async void WallUnstuck(SwipeData data)
-	{
-		if (IsStuck)
-		{
-			IsUnstucking = true;
-			Rb.isKinematic = false;
-			IsStuck = false;
-			var scaledStart = new Vector2(data.StartPosition.x / Screen.width, data.StartPosition.y / Screen.height); //TODO возможно заскейлить distance раньше
-			var scaledEnd = new Vector2(data.EndPosition.x / Screen.width, data.EndPosition.y / Screen.height);
-			var distance = Vector2.Distance(scaledStart, scaledEnd);
-
-			var relative = (transform.position + touchDetection.CurrentDirection.ToIso()) - transform.position;
-			Rb.velocity = relative/10;
-			var rot = Quaternion.LookRotation(relative, Vector2.up);
-			transform.rotation = rot;
-			await Task.Delay(200);
-			IsUnstucking = false;
-		}
-	}
-
 	public void FreezePlayer()
 	{
 		Rb.isKinematic = true;
-		IsStuck = true;
 	}
 	public void UnfreezePlayer() 
 	{
 		Rb.isKinematic = false;
-		IsStuck = false;
 	}
 
 	public void MoveBack()
@@ -91,9 +54,9 @@ public class PlayerController : MonoBehaviour
 		Rb.velocity += -transform.forward * 3;
 	}
 
-	void Rotate()
+	private void Rotate()
     {
-		if (touchDetection.CurrentDirection != Vector3.zero && isHolding && !IsStuck)
+		if (touchDetection.CurrentDirection != Vector3.zero && isHolding && !sword.IsStuck)
 		{
 			var relative = (transform.position + touchDetection.CurrentDirection.ToIso()) - transform.position;
 			var rot = Quaternion.LookRotation(relative, Vector2.up);
@@ -101,13 +64,13 @@ public class PlayerController : MonoBehaviour
 		}
 	}
 
-	async void Move (SwipeData data)
+	private async void Move (SwipeData data)
 	{
 		var scaledStart = new Vector2(data.StartPosition.x / Screen.width, data.StartPosition.y / Screen.height); //TODO возможно заскейлить distance раньше
 		var scaledEnd = new Vector2(data.EndPosition.x / Screen.width, data.EndPosition.y / Screen.height);
 		var distance = Vector2.Distance(scaledStart, scaledEnd);
 
-		if (!IsStuck)
+		if (!sword.IsStuck && !isWallJumping)
 		{
 			var smoothedDistance = SmoothDistance(distance);
 			Vector3 velocity = transform.forward * smoothedDistance * speed;
@@ -116,48 +79,19 @@ public class PlayerController : MonoBehaviour
 		}
 	}
 
-	float SmoothDistance(float distance)
+	private float SmoothDistance(float distance)
 	{
-		distance *= 3;
-
-		if (distance > 3)
-		{
-			distance = 3;
-		}
-		if (distance < 0.3f)
-		{
-			distance = 0.35f;
-		}
-		return distance;
+		distance *= 4;
+		var smoothedDistance = Mathf.Clamp(distance, 0.4f, 4f);
+		return smoothedDistance;
 	}
 
-	void ActivateAbility()
-	{
-		Debug.Log("Ability Activated");
-	}
-
-	void AccumulateForce(bool isHolding)
-	{
-		this.isHoldingStill = isHolding;
-	}
-
-	void TurnHoldOn()
+	private void TurnHoldOn()
 	{
 		isHolding = true;
 	}
-	void TurnHoldOff()
+	private void TurnHoldOff()
 	{
 		isHolding = false;
-	}
-
-	private void OnTriggerEnter(Collider other)
-	{
-		if(other.gameObject.tag == "Ball")
-		{
-			var ball = other.GetComponent<Ball>();
-			var direction = (other.transform.position - transform.position).normalized;
-			var force = Rb.velocity.magnitude*kickForce;
-			ball.GetKicked(direction, force);
-		}
 	}
 }

@@ -1,43 +1,48 @@
+using System.Threading.Tasks;
 using UnityEngine;
 
 public class PlayerWallJump : MonoBehaviour
 {
-    public int NumberOfJumps =2;
-
-    Vector3 lastVelocity;
-	Vector3 direction;
-	float currentSpeed;
-    int currentJumps = 0;
-	int maxWallJumps = 3;
+	[SerializeField] private TouchDetection touchDetection;
+	[SerializeField] private Sword sword;
+	public int NumberOfJumps { get; set; } = 2;
+	public bool CanJump { get; set; }
+	
 	Rigidbody rb;
+	PlayerController playerController;
+
+	private void OnEnable()
+	{
+		InputEvents.OnSwipe += WallJump;
+	}
+	private void OnDisable()
+	{
+		InputEvents.OnSwipe -= WallJump;
+	}
 
 	private void Start()
 	{
+		playerController = GetComponent<PlayerController>();
 		rb = GetComponent<Rigidbody>();
 	}
-	private void LateUpdate()
-	{
-        lastVelocity = rb.velocity;
-	}
 
-	private void OnCollisionEnter(Collision collision)
+	private async void WallJump(SwipeData data)
 	{
-		if (collision.gameObject.tag == "Wall")
+		if (sword.IsStuck)
 		{
-			if (currentJumps <= maxWallJumps)
-			{
-				currentSpeed = lastVelocity.magnitude;
-				direction = Vector3.Reflect(lastVelocity.normalized, collision.contacts[0].normal);
-				Quaternion rotation = Quaternion.LookRotation(new Vector3(direction.x, 0, direction.z), Vector3.up);
-				rb.velocity = new Vector3(direction.x, 0, direction.z) * Mathf.Max(currentSpeed, 0);
-				rb.velocity += new Vector3(0, 7, 0);
-				transform.rotation = rotation;
-				currentJumps++;
-			}
-			else
-			{
-				currentJumps = 0;
-			}
+			playerController.UnfreezePlayer();
+
+			var relative = (transform.position + touchDetection.CurrentDirection.ToIso()) - transform.position;
+			var rot = Quaternion.LookRotation(relative, Vector2.up);
+			transform.rotation = rot;
+
+			Vector3 velocity = transform.forward * 8;
+			rb.velocity = velocity;
+			rb.velocity += new Vector3(0, 5, 0);
+			
+			await Task.Delay(200);
+			playerController.UnfreezePlayer();
+			sword.SetIsStuckFalse();
 		}
 	}
 }

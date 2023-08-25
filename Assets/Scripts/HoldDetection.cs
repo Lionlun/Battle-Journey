@@ -2,17 +2,17 @@ using UnityEngine;
 
 public class HoldDetection : MonoBehaviour
 {
-	public Vector2 fingerCurrentPosition;
-	Vector2 fingerDownPosition;
-	float distance = 0;
-	bool isHolding;
+	public Vector2 fingerCurrentPosition { get; set; }
+	private Vector2 fingerDownPosition;
+	private float distance = 0;
+	private bool isHolding;
 
-   void Update()
+   private void Update()
     {
 		HandleHold();
 	}
 
-	void HandleHold()
+	private void HandleHold()
 	{
 		foreach (Touch touch in Input.touches)
 		{

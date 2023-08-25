@@ -3,32 +3,48 @@ using UnityEngine;
 
 public class Sword : MonoBehaviour
 {
-	[HideInInspector] public bool IsUp;
-	[SerializeField] Transform swordAttackPosition;
-	[SerializeField] Transform swordUpPosition;
+	[HideInInspector] public bool IsUp { get; set; }
+	[HideInInspector] public bool IsStuck { get; set; }
+
+	[SerializeField] private Transform swordAttackPosition;
+	[SerializeField] private Transform swordUpPosition;
+	[SerializeField] private PlayerController player;
 
 	private int damage = 25;
 	private float minimumSpeedToPenetrate = 6;
 	private float knockbackCooldown = 0;
 	private float knockbackCooldownRefresh = 0.5f;
+	private float timeToToggleWeapon;
+	private float timeToToggleWeaponRefresh = 1f;
 
-	[SerializeField] PlayerController player;
+	private bool isHoldingStill;
 
 	private void OnEnable()
 	{
-		InputEvents.OnTap += ToggleWeapon;
+		InputEvents.OnHold += CheckHoldStill;
+		InputEvents.OnEndTouch += RefreshWeaponTimer;
 		IsUp = true;
 		transform.localPosition = swordUpPosition.localPosition;
 		transform.localRotation = swordUpPosition.localRotation;
-
 	}
 	private void OnDisable()
 	{
-		InputEvents.OnTap -= ToggleWeapon;
+		InputEvents.OnHold -= CheckHoldStill;
+		InputEvents.OnEndTouch -= RefreshWeaponTimer;
 	}
-
+	private void Start()
+	{
+		timeToToggleWeapon = timeToToggleWeaponRefresh;
+	}
+	
 	private void Update()
 	{
+		if (isHoldingStill)
+		{
+			timeToToggleWeapon -= Time.deltaTime;
+		}
+		ToggleWeapon();
+
 		if (knockbackCooldown > 0)
 		{
 			knockbackCooldown -= Time.deltaTime;
@@ -46,6 +62,29 @@ public class Sword : MonoBehaviour
 		}
 	}
 
+	public void Stuck(Transform enemyTransform)
+	{
+
+		var direction = (enemyTransform.position - transform.position).normalized;
+		var directionNeeded = new Vector3(direction.x, 0, direction.z);
+
+		transform.position += directionNeeded / 1.5f;
+
+		player.FreezePlayer();
+	}
+
+	public void SetIsStuckFalse()
+	{
+		IsStuck = false;
+	}
+
+	public async void Unstuck()
+	{
+		player.MoveBack();
+		await Task.Delay(300);
+		player.UnfreezePlayer();
+	}
+
 	private async void OnTriggerEnter(Collider other)
 	{
 		if (!IsUp)
@@ -60,11 +99,10 @@ public class Sword : MonoBehaviour
 					
 					if (other != null)
 					{
+						IsStuck = true;
 						Stuck(other.gameObject.transform);
-						await Task.Delay(200);
 						enemyHealth.TakeDamage(damage);
 
-						Unstuck();
 
 					}
 				}
@@ -74,13 +112,13 @@ public class Sword : MonoBehaviour
 			{
 				if (player.Rb.velocity.magnitude > minimumSpeedToPenetrate && !player.IsUnstucking)
 				{
+					IsStuck = true;
 					Stuck(other.gameObject.transform);
 				}
 			}
 
 		}
 	}
-
 	private void OnTriggerStay(Collider other)
 	{
 		if (!IsUp)
@@ -105,26 +143,24 @@ public class Sword : MonoBehaviour
 					knockBackComponent.KnockBack(other.transform.position, 25);
 				}
 			}
-
 		}
 	}
 
-	public void Stuck(Transform enemyTransform)
+	private void CheckHoldStill(bool isHolding)
 	{
-		var direction = enemyTransform.position - transform.position;
-		transform.position += direction.normalized / 2;
-		player.FreezePlayer();
+		isHoldingStill = isHolding;
 	}
 
-	public async void Unstuck()
+	private void ToggleWeapon()
 	{
-		player.MoveBack();
-		await Task.Delay(300);
-		player.UnfreezePlayer();
+		if (timeToToggleWeapon <= 0)
+		{
+			IsUp = !IsUp;
+			timeToToggleWeapon = timeToToggleWeaponRefresh;
+		}
 	}
-
-	void ToggleWeapon()
+	private void RefreshWeaponTimer()
 	{
-		IsUp = !IsUp;
+		timeToToggleWeapon = timeToToggleWeaponRefresh;
 	}
 }
