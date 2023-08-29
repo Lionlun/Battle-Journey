@@ -10,7 +10,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float speed = 15;
  
 	[SerializeField] private TouchDetection touchDetection;
-	Sword sword;
+	[SerializeField] Sword sword;
 
 	private bool isHolding;
 	
@@ -31,7 +31,6 @@ public class PlayerController : MonoBehaviour
 	}
 	private void Start()
 	{
-		sword = GetComponentInChildren<Sword>();
 		Rb = GetComponent<Rigidbody>();
 	}
 

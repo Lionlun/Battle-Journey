@@ -37,8 +37,11 @@ public class StillEnemyAttack : MonoBehaviour
 			}	
         }
 	}
-
-    private void RotateTowardsTarget(Vector3 targetPosition)
+	public void FinishAttacking()
+	{
+		isAttacking = false;
+	}
+	private void RotateTowardsTarget(Vector3 targetPosition)
     {
 		var directionToTraget = targetPosition - transform.position;
 		var vector2Direction = new Vector3(directionToTraget.x, 0, directionToTraget.z);
@@ -50,8 +53,7 @@ public class StillEnemyAttack : MonoBehaviour
     {
 		Debug.Log("Attack target");
         animator.SetTrigger("Attack");
-		await Task.Delay(2000);
 		attackCooldown = 2;
-		isAttacking = false;
+		
 	}
 }

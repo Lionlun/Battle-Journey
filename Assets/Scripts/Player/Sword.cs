@@ -6,8 +6,8 @@ public class Sword : MonoBehaviour
 	[HideInInspector] public bool IsUp { get; set; }
 	[HideInInspector] public bool IsStuck { get; set; }
 
-	[SerializeField] private Transform swordAttackPosition;
-	[SerializeField] private Transform swordUpPosition;
+	//[SerializeField] private Transform swordAttackPosition;
+	//[SerializeField] private Transform swordUpPosition;
 	[SerializeField] private PlayerController player;
 
 	private int damage = 25;
@@ -24,8 +24,8 @@ public class Sword : MonoBehaviour
 		InputEvents.OnHold += CheckHoldStill;
 		InputEvents.OnEndTouch += RefreshWeaponTimer;
 		IsUp = true;
-		transform.localPosition = swordUpPosition.localPosition;
-		transform.localRotation = swordUpPosition.localRotation;
+		//transform.localPosition = swordUpPosition.localPosition;
+		//transform.localRotation = swordUpPosition.localRotation;
 	}
 	private void OnDisable()
 	{
@@ -52,13 +52,13 @@ public class Sword : MonoBehaviour
 
 		if (IsUp)
 		{
-			transform.localPosition = swordUpPosition.localPosition;
-			transform.localRotation = swordUpPosition.localRotation;
+			//transform.localPosition = swordUpPosition.localPosition;
+			//transform.localRotation = swordUpPosition.localRotation;
 		}
 		else
 		{
-			transform.localPosition = swordAttackPosition.localPosition;
-			transform.localRotation = swordAttackPosition.localRotation;
+			//transform.localPosition = swordAttackPosition.localPosition;
+			//transform.localRotation = swordAttackPosition.localRotation;
 		}
 	}
 
