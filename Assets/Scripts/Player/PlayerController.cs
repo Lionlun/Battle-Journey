@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using UnityEngine;
 
+[RequireComponent(typeof(Rigidbody))]
 public class PlayerController : MonoBehaviour
 { //TO DO разделить на отдельные классы
 	public bool IsUnstucking { get; set; }
@@ -13,7 +14,6 @@ public class PlayerController : MonoBehaviour
 	[SerializeField] Sword sword;
 
 	private bool isHolding;
-	
 	private bool isWallJumping;
 
 	private void OnEnable()

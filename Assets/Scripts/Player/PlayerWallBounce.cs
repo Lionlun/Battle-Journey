@@ -1,5 +1,6 @@
 using UnityEngine;
 
+[RequireComponent(typeof(Rigidbody))]
 public class PlayerWallBounce : MonoBehaviour
 {
 	public int NumberOfJumps { get; set; } = 2;

@@ -1,76 +1,111 @@
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class FootProcedualAnim : MonoBehaviour
 {
-	[SerializeField] Transform body;
-	[SerializeField] float footSpacing = 0.2f;
-	[SerializeField] float footForwardOffset = 0.5f;
-	[SerializeField] LayerMask terrainLayer;
-	[SerializeField] float stepDistance = 1;
-	[SerializeField] float stepHeight = 1;
-	[SerializeField] float speed = 2;
-	Vector3 newPosition;
-	Vector3 oldPosition;
-	Vector3 currentPosition;
-	float lerp;
-	[SerializeField] bool isLeft;
-	
+	#region StepParameters
+	[Header("Step Parameters")]
+	[SerializeField] private float footSpacing = 0.2f;
+	[SerializeField] private float footForwardOffset = 0.5f;
+	[SerializeField] private float stepDistance = 1;
+	[SerializeField] private float stepHeight = 1;
+	[SerializeField] private float animDefaultSpeed = 15;
+	[SerializeField] private float animSpeedThreshold = 13;
+	[SerializeField] private float animHighSpeed = 50;
+	private float animSpeed;
+	[Space]
+	#endregion
+
+	[SerializeField] private LayerMask terrainLayer;
+	[SerializeField] private FootProcedualAnim oppositeFoot;
+	[SerializeField] private Transform body;
+	[SerializeField] private Rigidbody playerRb;
+
+	private float lerp;
+	private Vector3 newPosition;
+	private Vector3 oldPosition;
+	private Vector3 currentPosition;
+
 	private void Start()
 	{
+		animSpeed = animDefaultSpeed;
 		currentPosition = transform.position;
-		newPosition = transform.position;
-		oldPosition = transform.position;
-	   Ray ray = new Ray(body.position + (body.right * footSpacing) + body.up*footForwardOffset, Vector3.down);
-	
+		currentPosition = newPosition = oldPosition = transform.position;
+		lerp = 1;
+	}
+
+	private void Update()
+	{
+		transform.position = currentPosition;
+		CheckDistance();
+		PlaceLegsDefault();
+		MakeStep();
+		AccelerateAnimationSpeed();
+	}
+
+	public bool IsMoving()
+	{
+		return lerp < 1;
+	}
+
+	private void CheckDistance()
+	{
+		Ray ray = new Ray(body.position + (body.right * footSpacing) + body.up * footForwardOffset, Vector3.down);
 
 		if (Physics.Raycast(ray, out RaycastHit info, 10, terrainLayer.value))
 		{
-			newPosition = info.point;
-			oldPosition = info.point;
+			if (Vector3.Distance(newPosition, info.point) > stepDistance && !oppositeFoot.IsMoving() && lerp >= 1)
+			{
+				lerp = 0f;
+				newPosition = info.point;
+			}
 		}
 	}
-	void Update()
-    {
-		transform.position = currentPosition;
 
-		Ray ray = new Ray(body.position + (body.right * footSpacing) + body.up * footForwardOffset, Vector3.down);
-	
+	private void PlaceLegsDefault()
+	{
+		Ray ray = new Ray(body.position + (body.right * footSpacing), Vector3.down);
+
 		if (Physics.Raycast(ray, out RaycastHit info, 10, terrainLayer.value))
 		{
-			if (Vector3.Distance(newPosition, info.point) > stepDistance)
+			if (playerRb.velocity == Vector3.zero)
 			{
-				Debug.Log("Greater");
-				lerp = 0;
-				newPosition = info.point;
-				isLeft = !isLeft;
+				currentPosition = oldPosition = newPosition = info.point;
 			}
-			
 		}
+	}
+
+	private void MakeStep()
+	{
 		if (lerp < 1)
 		{
-			Vector3 footPosition = Vector3.Lerp(oldPosition, newPosition, lerp);
-			footPosition.y += Mathf.Sin(lerp * Mathf.PI) * stepHeight;
+			Vector3 tempPosition = Vector3.Lerp(oldPosition, newPosition, lerp);
+			tempPosition.y += Mathf.Sin(lerp * Mathf.PI) * stepHeight;
 
-			if (isLeft)
-			{
-				currentPosition = footPosition;
-			}
-				
-			lerp += Time.deltaTime *speed;
+			currentPosition = tempPosition;
+			lerp += Time.deltaTime * animSpeed;
 		}
 		else
 		{
-			
 			oldPosition = newPosition;
-		
 		}
-		
+	}
+
+	private void AccelerateAnimationSpeed()
+	{
+		if (playerRb.velocity.magnitude > animSpeedThreshold)
+		{
+			Debug.Log(playerRb.velocity.magnitude);
+			animSpeed = animHighSpeed;
+		}
+		else
+		{
+			animSpeed = animDefaultSpeed;
+		}
 	}
 
 	private void OnDrawGizmos()
 	{
 		Gizmos.color = Color.red;
-		Gizmos.DrawSphere(newPosition, 0.5f);
+		Gizmos.DrawSphere(newPosition, 0.1f);
 	}
 }
