@@ -27,7 +27,6 @@ public class PlayerController : MonoBehaviour
 		InputEvents.OnSwipe -= Move;
 		InputEvents.OnTouch -= TurnHoldOn;
 		InputEvents.OnEndTouch -= TurnHoldOff;
-
 	}
 	private void Start()
 	{
@@ -37,15 +36,6 @@ public class PlayerController : MonoBehaviour
 	private void FixedUpdate()
 	{
 		Rotate();
-	}
-
-	public void FreezePlayer()
-	{
-		Rb.isKinematic = true;
-	}
-	public void UnfreezePlayer() 
-	{
-		Rb.isKinematic = false;
 	}
 
 	public void MoveBack()

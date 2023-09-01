@@ -6,8 +6,6 @@ public class Sword : MonoBehaviour
 	[HideInInspector] public bool IsUp { get; set; }
 	[HideInInspector] public bool IsStuck { get; set; }
 
-	//[SerializeField] private Transform swordAttackPosition;
-	//[SerializeField] private Transform swordUpPosition;
 	[SerializeField] private PlayerController player;
 
 	private int damage = 25;
@@ -17,15 +15,18 @@ public class Sword : MonoBehaviour
 	private float timeToToggleWeapon;
 	private float timeToToggleWeaponRefresh = 1f;
 
+
 	private bool isHoldingStill;
+
+	[SerializeField] Transform swordUpPosition;
+	[SerializeField] Transform swordDownPosition;
+	[SerializeField] Transform weaponPoint;
+	Vector3 positionAtCollision = Vector3.zero;
 
 	private void OnEnable()
 	{
 		InputEvents.OnHold += CheckHoldStill;
 		InputEvents.OnEndTouch += RefreshWeaponTimer;
-		IsUp = true;
-		//transform.localPosition = swordUpPosition.localPosition;
-		//transform.localRotation = swordUpPosition.localRotation;
 	}
 	private void OnDisable()
 	{
@@ -35,10 +36,17 @@ public class Sword : MonoBehaviour
 	private void Start()
 	{
 		timeToToggleWeapon = timeToToggleWeaponRefresh;
+		IsUp = true;
 	}
 	
 	private void Update()
 	{
+		if (!IsStuck)
+		{
+			transform.position = weaponPoint.position;
+			transform.rotation = weaponPoint.rotation;
+		}
+
 		if (isHoldingStill)
 		{
 			timeToToggleWeapon -= Time.deltaTime;
@@ -49,28 +57,20 @@ public class Sword : MonoBehaviour
 		{
 			knockbackCooldown -= Time.deltaTime;
 		}
-
-		if (IsUp)
+		if (IsStuck)
 		{
-			//transform.localPosition = swordUpPosition.localPosition;
-			//transform.localRotation = swordUpPosition.localRotation;
+			transform.position = positionAtCollision; //в процессе
 		}
-		else
+		if (IsUp && !IsStuck)
 		{
-			//transform.localPosition = swordAttackPosition.localPosition;
-			//transform.localRotation = swordAttackPosition.localRotation;
+			weaponPoint.position = swordUpPosition.position;
+			weaponPoint.rotation = swordUpPosition.rotation;
 		}
-	}
-
-	public void Stuck(Transform enemyTransform)
-	{
-
-		var direction = (enemyTransform.position - transform.position).normalized;
-		var directionNeeded = new Vector3(direction.x, 0, direction.z);
-
-		transform.position += directionNeeded / 1.5f;
-
-		player.FreezePlayer();
+		if (!IsUp && !IsStuck)
+		{
+			weaponPoint.position = swordDownPosition.position;
+			weaponPoint.rotation = swordDownPosition.rotation;
+		}
 	}
 
 	public void SetIsStuckFalse()
@@ -78,11 +78,18 @@ public class Sword : MonoBehaviour
 		IsStuck = false;
 	}
 
-	public async void Unstuck()
+	public void Unstuck()
 	{
 		player.MoveBack();
-		await Task.Delay(300);
-		player.UnfreezePlayer();
+	}
+
+	private void WallStuck()
+	{
+		if (!player.IsUnstucking)
+		{
+			positionAtCollision = transform.position; //в процессе
+			IsStuck = true;
+		}
 	}
 
 	private async void OnTriggerEnter(Collider other)
@@ -100,10 +107,8 @@ public class Sword : MonoBehaviour
 					if (other != null)
 					{
 						IsStuck = true;
-						Stuck(other.gameObject.transform);
+
 						enemyHealth.TakeDamage(damage);
-
-
 					}
 				}
 			}
@@ -112,13 +117,13 @@ public class Sword : MonoBehaviour
 			{
 				if (player.Rb.velocity.magnitude > minimumSpeedToPenetrate && !player.IsUnstucking)
 				{
-					IsStuck = true;
-					Stuck(other.gameObject.transform);
+					WallStuck();
 				}
 			}
-
 		}
 	}
+
+
 	private void OnTriggerStay(Collider other)
 	{
 		if (!IsUp)
@@ -140,7 +145,7 @@ public class Sword : MonoBehaviour
 				{
 					var enemyHealth = other.gameObject.GetComponent<Health>();
 					var knockBackComponent = player.gameObject.GetComponent<Knockback>();
-					knockBackComponent.KnockBack(other.transform.position, 25);
+					//knockBackComponent.KnockBack(other.transform.position, 25);
 				}
 			}
 		}
