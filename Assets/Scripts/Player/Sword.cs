@@ -3,10 +3,13 @@ using UnityEngine;
 
 public class Sword : MonoBehaviour
 {
-	[HideInInspector] public bool IsUp { get; set; }
-	[HideInInspector] public bool IsStuck { get; set; }
+	public bool IsUp { get; set; }
+	public bool IsStuck { get; set; }
+	public bool IsWallStuck { get; set; }
+	public bool IsEnemyStuck { get; set; }
 
 	[SerializeField] private PlayerController player;
+	[SerializeField] private PlayerWallJump playerJump;
 
 	private int damage = 25;
 	private float minimumSpeedToPenetrate = 6;
@@ -14,7 +17,6 @@ public class Sword : MonoBehaviour
 	private float knockbackCooldownRefresh = 0.5f;
 	private float timeToToggleWeapon;
 	private float timeToToggleWeaponRefresh = 1f;
-
 
 	private bool isHoldingStill;
 
@@ -83,8 +85,21 @@ public class Sword : MonoBehaviour
 		player.MoveBack();
 	}
 
-	private void WallStuck()
+	private void ObjectStuck<T>(T type)
 	{
+		if (type is Enemy)
+		{
+			Debug.Log("IS ENEMY");
+			IsWallStuck = false;
+			IsEnemyStuck = true;
+		}
+		else if (type is Wall)
+		{
+			Debug.Log("IS WALL");
+			IsWallStuck = true;
+			IsEnemyStuck = false;
+		}
+
 		if (!player.IsUnstucking)
 		{
 			positionAtCollision = transform.position; //в процессе
@@ -92,12 +107,15 @@ public class Sword : MonoBehaviour
 		}
 	}
 
+
 	private async void OnTriggerEnter(Collider other)
 	{
 		if (!IsUp)
 		{
-			if (other.gameObject.tag == "Enemy")
+			if (other.gameObject.GetComponent<Enemy>() != null)
 			{
+				var enemy = other.gameObject.GetComponent<Enemy>();
+
 				if (player.Rb.velocity.magnitude > minimumSpeedToPenetrate)
 				{
 					var enemyHealth = other.gameObject.GetComponent<Health>();
@@ -106,18 +124,19 @@ public class Sword : MonoBehaviour
 					
 					if (other != null)
 					{
-						IsStuck = true;
-
+						ObjectStuck(enemy);
+					
 						enemyHealth.TakeDamage(damage);
 					}
 				}
 			}
 
-			if (other.gameObject.tag == "Wall")
+			if (other.gameObject.GetComponent<Wall>() != null)
 			{
+				var wall = other.gameObject.GetComponent<Wall>();
 				if (player.Rb.velocity.magnitude > minimumSpeedToPenetrate && !player.IsUnstucking)
 				{
-					WallStuck();
+					ObjectStuck(wall);
 				}
 			}
 		}
@@ -128,22 +147,20 @@ public class Sword : MonoBehaviour
 	{
 		if (!IsUp)
 		{
-			if (other.gameObject.tag == "Enemy")
+			if (other.gameObject.GetComponent<Enemy>() != null)
 			{
-				if (player.Rb.velocity.magnitude < minimumSpeedToPenetrate && knockbackCooldown <=0)
+				if (player.Rb.velocity.magnitude < minimumSpeedToPenetrate && knockbackCooldown <=0 && !IsStuck)
 				{
 					knockbackCooldown = knockbackCooldownRefresh;
-					var enemyHealth = other.gameObject.GetComponent<Health>();
 					var knockBackComponent = player.gameObject.GetComponent<Knockback>();
 					knockBackComponent.KnockBack(other.transform.position, 250);
 				}
 			}
 
-			if (other.gameObject.tag == "Wall")
+			if (other.gameObject.GetComponent<Wall>() != null)
 			{
 				if (player.Rb.velocity.magnitude < minimumSpeedToPenetrate)
 				{
-					var enemyHealth = other.gameObject.GetComponent<Health>();
 					var knockBackComponent = player.gameObject.GetComponent<Knockback>();
 					//knockBackComponent.KnockBack(other.transform.position, 25);
 				}
