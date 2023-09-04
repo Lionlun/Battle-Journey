@@ -2,30 +2,53 @@ using UnityEngine;
 
 public class MazeCellObject : MonoBehaviour
 {
-	[SerializeField] GameObject topWall;
-	[SerializeField] GameObject bottomWall;
-	[SerializeField] GameObject leftWall;
-	[SerializeField] GameObject rightWall;
-	[SerializeField] GameObject floor;
+	public Wall TopWall;
+	public Wall BottomWall;
+	public Wall LeftWall;
+	public Wall RightWall;
+	public GameObject Floor;
 
 	public Vector2Int CellPosition { get; set; }
 
+	private void Start()
+	{
+		foreach (Transform child in transform)
+		{
+			if (child.gameObject.GetComponent<Wall>() != null)
+			{
+				
+			}
+		}
+	}
+
 	public void Init(bool top, bool bottom, bool left, bool right, bool isFloorActive)
 	{
-		topWall.SetActive(top);
-		bottomWall.SetActive(bottom);
-		leftWall.SetActive(left);
-		rightWall.SetActive(right);
-		floor.SetActive(isFloorActive);
+		TopWall.gameObject.SetActive(top);
+		BottomWall.gameObject.SetActive(bottom);
+		LeftWall.gameObject.SetActive(left);
+		RightWall.gameObject.SetActive(right);
+		Floor.SetActive(isFloorActive);
 	}
 
 	public void DeactivateFloor()
 	{
-		floor.SetActive(false);
+		Floor.SetActive(false);
 	}
 
 	public void ActivateFloor()
 	{
-		floor.SetActive(true);
+		Floor.SetActive(true);
+	}
+
+	public bool CheckWallsPresence()
+	{
+		if (BottomWall.isActiveAndEnabled || TopWall.isActiveAndEnabled || LeftWall.isActiveAndEnabled || RightWall.isActiveAndEnabled) 
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
 	}
 }

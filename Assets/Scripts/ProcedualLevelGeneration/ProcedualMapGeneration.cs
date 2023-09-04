@@ -4,13 +4,11 @@ using UnityEngine;
 
 public class ProcedualMapGeneration : MonoBehaviour
 {
-	public GameObject blockGameObject;
     public Transform wallToSpawn;
-    public GameObject outerWall;
     public GameObject hole;
 
-    private int worldSizeX = 10;
-    private int worldSizeZ = 10;
+    private int worldSizeX = 5;
+    private int worldSizeZ = 5;
 
     private float CellSize = 3f;
 
@@ -21,19 +19,15 @@ public class ProcedualMapGeneration : MonoBehaviour
 
 	NewMazeCell[,] maze;
 
-	//TODO implement mazeCells
-
 	void Start()
     {
 		mazeRenderer = GetComponent<MazeRenderer>();
-		//InitiateGrid();	
 		SrartGeneration();
 	}
 	void SrartGeneration()
     {
 		CreateMaze();
 		ActivateFloor();
-		SpawnHoles();
 	}
     private void CreateMaze()
     {
@@ -53,7 +47,6 @@ public class ProcedualMapGeneration : MonoBehaviour
 		}
 	}
 
-
 	private void SpawnHoles()
 	{
 		for (int x = 0; x < worldSizeX; x++)
@@ -66,7 +59,7 @@ public class ProcedualMapGeneration : MonoBehaviour
 				{
 					if (maze[x, y].X + 1 < worldSizeX)
 					{
-						if (maze[x, y].LeftWall == true && maze[x + 1, y].LeftWall == true)
+						if (maze[x, y].IsLeftWall == true && maze[x + 1, y].IsLeftWall == true)
 						{
 							mazeRenderer.Cells[new Vector2Int(x, y)].DeactivateFloor();
 							Instantiate(hole, mazeRenderer.Cells[new Vector2Int(x, y)].transform.position, Quaternion.identity);
@@ -75,7 +68,7 @@ public class ProcedualMapGeneration : MonoBehaviour
 
 					if (maze[x, y].Y - 1 >= 0)
 					{
-						if (maze[x, y].TopWall == true && maze[x, y - 1].TopWall == true)
+						if (maze[x, y].IsTopWall == true && maze[x, y - 1].IsTopWall == true)
 						{
 							mazeRenderer.Cells[new Vector2Int(x, y)].DeactivateFloor();
 							Instantiate(hole, mazeRenderer.Cells[new Vector2Int(x, y)].transform.position, Quaternion.identity);

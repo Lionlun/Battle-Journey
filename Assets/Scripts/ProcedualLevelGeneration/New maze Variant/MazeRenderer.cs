@@ -17,7 +17,7 @@ public class MazeRenderer : MonoBehaviour
 	public Dictionary<Vector2Int,MazeCellObject> Cells = new Dictionary<Vector2Int, MazeCellObject>();
 
 	public void RenderWalls(NewMazeCell[,] maze, int mazeWidth, int mazeHeight, float cellSize)
-	{;
+	{
 		CellSize = cellSize;
 	
 		for (int x  = 0; x < mazeWidth; x++)
@@ -27,19 +27,13 @@ public class MazeRenderer : MonoBehaviour
 				GameObject newCell = Instantiate(mazeCellPrefab, new Vector3((float) x * CellSize, transform.position.y, (float)y* CellSize), Quaternion.identity, transform);
 				MazeCellObject mazeCell = newCell.GetComponent<MazeCellObject>();
 
-				top = maze[x, y].TopWall;
-				left = maze[x, y].LeftWall;
+				top = false;
+				left = false;
 				right = false;
 				bottom = false;
 
-				SpawnNoWall(maze, x, y);
+				SpawnOuterWalls(mazeWidth, mazeHeight, x, y);
 
-				if (x == mazeWidth - 1) right = true;
-				if (y == 0) bottom = true;
-				if (y == mazeHeight - 1) top = true;
-				if (x == 0) left = true;
-
-				
 				mazeCell.Init(top, bottom, left, right, isFloorActive);
 				mazeCell.CellPosition = new Vector2Int(x, y);
 				Cells.Add(mazeCell.CellPosition, mazeCell);
@@ -47,22 +41,11 @@ public class MazeRenderer : MonoBehaviour
 		}
 	}
 
-	private void SpawnNoWall(NewMazeCell[,] maze, int x, int y)
+	private void SpawnOuterWalls(int mazeWidth, int mazeHeight, int x, int y)
 	{
-		var random = Random.Range(0, 101);
-
-		if (random < absentWallSpawnPercent)
-		{
-			maze[x,y].TopWall = false;
-			maze[x,y].LeftWall = false;
-			top = false;
-			left = false;
-			bottom = false;
-			right = false;
-		}
-		else
-		{
-			return;
-		}
+		if (x == mazeWidth - 1) right = true;
+		if (y == 0) bottom = true;
+		if (y == mazeHeight - 1) top = true;
+		if (x == 0) left = true;
 	}
 }
