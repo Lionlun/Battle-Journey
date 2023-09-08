@@ -10,6 +10,7 @@ TagManager:
   - Wall
   - Weapon
   - Ball
+  - WindArea
   layers:
   - Default
   - TransparentFX
