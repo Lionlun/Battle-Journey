@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class StillEnemyAttack : MonoBehaviour
 {
-    private float attackDamage = 10;
+	[SerializeField] EnemyWeapon weapon;
     private float attackCooldown = 2;
     private float rotationSpeed = 5;
     private bool isAttacking;
@@ -14,7 +14,7 @@ public class StillEnemyAttack : MonoBehaviour
 	{
 		animator = GetComponent<Animator>();
 	}
-	void Update()
+	private void Update()
     {
         if (attackCooldown > 0)
         {
@@ -23,7 +23,7 @@ public class StillEnemyAttack : MonoBehaviour
     }
     private void OnTriggerStay(Collider other)
     {
-        if (other.gameObject.CompareTag("Player"))
+        if (other.gameObject.GetComponent<PlayerController>() != null)
         {
             if (attackCooldown < 0)
             {
@@ -41,6 +41,14 @@ public class StillEnemyAttack : MonoBehaviour
 	{
 		isAttacking = false;
 	}
+	public void SetAttackPhaseTrue()
+	{
+		weapon.SetAttackPhaseTrue();
+	}
+	public void SetAttackPhaseFalse()
+	{
+		weapon.SetAttackPhaseFalse();
+	}
 	private void RotateTowardsTarget(Vector3 targetPosition)
     {
 		var directionToTraget = targetPosition - transform.position;
@@ -49,11 +57,10 @@ public class StillEnemyAttack : MonoBehaviour
 		transform.rotation = Quaternion.LookRotation(newDirection);
 
 	}
-    private async void Attack()
+    private void Attack()
     {
 		Debug.Log("Attack target");
         animator.SetTrigger("Attack");
 		attackCooldown = 2;
-		
 	}
 }
