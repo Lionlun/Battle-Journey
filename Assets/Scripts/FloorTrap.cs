@@ -62,7 +62,11 @@ public class FloorTrap : MonoBehaviour
 	{
 		await floor.ActivateTrap();
 		await Task.Delay(secondsToReturnFloor*1000);
-		floor.ResetTrap();
+
+		if(floor != null)
+		{
+			floor.ResetTrap();
+		}
 	}
 
 	private IEnumerator TrapActivationRoutine()

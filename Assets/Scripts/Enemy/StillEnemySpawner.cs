@@ -13,7 +13,7 @@ public class StillEnemySpawner : SpawnerBase
 
 	protected override IEnumerator Spawn()
 	{
-		spawnCoordinates = GetRandomMiddleAreaCoordinate(); //extension метод
+		spawnCoordinates = GetRandomMiddleAreaCoordinate();
 		spawnPosition = spawnCoordinates.ConvertToWorldPosition();
 		yield return new WaitForSeconds(objectSpawnTime);
 
@@ -28,9 +28,14 @@ public class StillEnemySpawner : SpawnerBase
 
 	private void ActivateWalls(Vector3 direction, Vector2Int middleArea)  //отдельный класс?
 	{
-		
+
 		var vector2IntDirection = new Vector2Int(-(int)direction.x, -(int)direction.z);
 		var neighbourCellVector = middleArea + vector2IntDirection;
+
+		if (Cells[middleArea] == null || Cells[neighbourCellVector] == null)
+		{
+			return;
+		}
 		var isCell = Cells.TryGetValue(middleArea, out MazeCellObject cell); //?????????
 		var isNeighbourCell = Cells.TryGetValue(neighbourCellVector, out MazeCellObject neighbourCellObj);
 

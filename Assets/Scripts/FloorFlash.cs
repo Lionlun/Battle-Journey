@@ -14,14 +14,23 @@ public class FloorFlash : MonoBehaviour
 		meshRenderer = GetComponent<MeshRenderer>();
         originalColor = meshRenderer.material.color;
 	}
-
+	private void Update()
+	{
+		if (meshRenderer == null)
+		{
+			
+		}
+	}
 	public async Task Flash()
     {
 		for (int i = 0; i < numberOfFlashes; i++)
 		{
 			meshRenderer.material.color = Color.red;
 			await Task.Delay(flashTime);
-			meshRenderer.material.color = originalColor;
+			if (meshRenderer != null)
+			{
+				meshRenderer.material.color = originalColor;
+			}
 			await Task.Delay(flashTime);
 		}
 	}
@@ -34,6 +43,9 @@ public class FloorFlash : MonoBehaviour
 
 	public void ResetTrap()
 	{
-		this.gameObject.SetActive(true);
+		if (this.gameObject != null)
+		{
+			this.gameObject.SetActive(true);
+		}
 	}
 }
