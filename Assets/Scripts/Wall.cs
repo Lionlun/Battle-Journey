@@ -9,12 +9,6 @@ public class Wall : MonoBehaviour
 	public bool IsLeft { get; set; }
 	public bool IsRight { get; set; }
 
-
-	void Start()
-    {
-        
-    }
-
     private void DeterminePosition()
     {
 

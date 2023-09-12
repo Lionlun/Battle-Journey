@@ -94,7 +94,6 @@ public class FootProcedualAnim : MonoBehaviour
 	{
 		if (playerRb.velocity.magnitude > animSpeedThreshold)
 		{
-			Debug.Log(playerRb.velocity.magnitude);
 			animSpeed = animHighSpeed;
 		}
 		else
