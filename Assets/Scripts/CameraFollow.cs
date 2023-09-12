@@ -8,8 +8,8 @@ public class CameraFollow : MonoBehaviour
 	Vector3 cameraAimOffset;
 	Vector3 velocity = Vector3.zero;
 
-	float smoothTime = 0.25f;
-	float cameraMaxOffset = 0.15f;
+	float smoothTime = 0.12f;
+	float cameraMaxOffset = 0.05f;
 	float cameraOffsetMultiplier = 20;
 
 	bool isHolding;
@@ -47,7 +47,7 @@ public class CameraFollow : MonoBehaviour
 	{
 		if (isHolding)
 		{
-			var aimOffset = ((transform.position + touchDetection.CurrentDirection.ToIso()) - transform.position);
+			var aimOffset = transform.position - (transform.position + touchDetection.CurrentDirection.ToIso());
 			cameraAimOffset.x = Mathf.Clamp(aimOffset.x, -cameraMaxOffset, cameraMaxOffset);
 			cameraAimOffset.z = Mathf.Clamp(aimOffset.z, -cameraMaxOffset, cameraMaxOffset);
 		}
