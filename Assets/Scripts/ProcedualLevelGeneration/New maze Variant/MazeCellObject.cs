@@ -40,6 +40,30 @@ public class MazeCellObject : MonoBehaviour
 		Floor.SetActive(true);
 	}
 
+	public void ActivateWalls(WallSide wallside)
+	{
+		if(wallside == WallSide.Left)
+		{
+			LeftWall.gameObject.SetActive(true);
+		}
+		if(wallside == WallSide.Right)
+		{
+			RightWall.gameObject.SetActive(true);
+		}
+		if(wallside == WallSide.Bottom)
+		{
+			BottomWall.gameObject.SetActive(true);
+		}
+		if (wallside == WallSide.Top)
+		{
+			TopWall.gameObject.SetActive(true);
+		}
+	}
+
+	public void DeactivateWalls(bool top, bool bottom, bool left, bool right)
+	{
+
+	}
 	public bool CheckWallsPresence()
 	{
 		if (BottomWall.isActiveAndEnabled || TopWall.isActiveAndEnabled || LeftWall.isActiveAndEnabled || RightWall.isActiveAndEnabled) 
