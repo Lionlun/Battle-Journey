@@ -9,6 +9,7 @@ public class InputEvents
 	public static event Action<Vector3> OnTouchPosition = delegate { };
 	public static event Action OnTouch = delegate { };
 	public static event Action OnEndTouch = delegate { };
+	public static event Action<bool> OnHoldStill = delegate { };
 	public static event Action<bool> OnHold = delegate { };
 
 	public static void SendDoubleTap()
@@ -29,6 +30,11 @@ public class InputEvents
 	public static void SendTouchPosition(Vector3 position)
 	{
 		OnTouchPosition?.Invoke(position);
+	}
+
+	public static void SendHoldStill(bool isHolding)
+	{
+		OnHoldStill?.Invoke(isHolding);
 	}
 
 	public static void SendHold(bool isHolding)
