@@ -5,7 +5,6 @@ public class SwordObjectStuckChecker : MonoBehaviour
 	public bool IsWallStuck { get; set; }
 	public bool IsEnemyStuck { get; set; }
 
-
 	private void ObjectStuck<T>(T type)
 	{
 		if (type is Enemy)
@@ -19,7 +18,6 @@ public class SwordObjectStuckChecker : MonoBehaviour
 			IsEnemyStuck = false;
 		}
 	}
-
 
 	private void OnTriggerEnter(Collider other)
 	{
