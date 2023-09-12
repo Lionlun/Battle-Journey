@@ -3,15 +3,18 @@ using UnityEngine;
 public class TouchDetection : MonoBehaviour
 {
 	public Vector3 CurrentDirection;
-	public float Distance;
+	public float Distance { get; set; }
 
-	Vector3 startPosition;
-	Vector3 currentPosition;
+	private Vector3 startPosition;
+	private Vector3 currentPosition;
 
-	void Update()
+	private void Update()
     {
 		if (Input.touchCount > 0)
 		{
+			GetDirection();
+			GetDistance();
+
 			foreach (Touch touch in Input.touches)
 			{
 				if (touch.phase == UnityEngine.TouchPhase.Began)
@@ -25,17 +28,17 @@ public class TouchDetection : MonoBehaviour
 				if (touch.phase == UnityEngine.TouchPhase.Ended)
 				{
 					InputEvents.SendEndTouch();
+					Distance = 0;
 				}
 
 				currentPosition = touch.position;
 			}
+		
 		}
 
-		GetDirection();
-		GetDistnace();
 	}
 
-	void GetDirection()
+	private void GetDirection()
 	{
 		if (Input.touchCount > 0)
 		{
@@ -46,7 +49,7 @@ public class TouchDetection : MonoBehaviour
 		}
 	}
 
-	void GetDistnace()
+	private void GetDistance()
 	{
 		Distance = Vector2.Distance(startPosition, currentPosition);
 	}
