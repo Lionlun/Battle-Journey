@@ -45,9 +45,9 @@ public class PlayerController : MonoBehaviour
 
 	private void Rotate()
     {
-		if (touchDetection.CurrentDirection != Vector3.zero && isHolding && !sword.IsStuck)
+		if (touchDetection.CurrentDirection != Vector3.zero && isHolding /*&& !sword.IsStuck*/)
 		{
-			var relative = (transform.position + touchDetection.CurrentDirection.ToIso()) - transform.position;
+			var relative = transform.position - (transform.position + touchDetection.CurrentDirection.ToIso());
 			var rot = Quaternion.LookRotation(relative, Vector2.up);
 			transform.rotation = rot;
 		}
@@ -59,7 +59,7 @@ public class PlayerController : MonoBehaviour
 		var scaledEnd = new Vector2(data.EndPosition.x / Screen.width, data.EndPosition.y / Screen.height);
 		var distance = Vector2.Distance(scaledStart, scaledEnd);
 
-		if (!sword.IsStuck && !isWallJumping)
+		if (!isWallJumping)
 		{
 			var smoothedDistance = SmoothDistance(distance);
 			Vector3 velocity = transform.forward * smoothedDistance * speed;
@@ -71,7 +71,7 @@ public class PlayerController : MonoBehaviour
 	private float SmoothDistance(float distance)
 	{
 		distance *= 4;
-		var smoothedDistance = Mathf.Clamp(distance, 0.4f, 4f);
+		var smoothedDistance = Mathf.Clamp(distance, 0.6f, 1f);
 		return smoothedDistance;
 	}
 
