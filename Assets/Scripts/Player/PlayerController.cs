@@ -1,5 +1,4 @@
 
-using System.Threading.Tasks;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
@@ -14,19 +13,18 @@ public class PlayerController : MonoBehaviour
 	[SerializeField] Sword sword;
 
 	private bool isHolding;
-	private bool isWallJumping;
 
 	private void OnEnable()
 	{
-		InputEvents.OnSwipe += Move;
 		InputEvents.OnTouch += TurnHoldOn;
 		InputEvents.OnEndTouch += TurnHoldOff;
+	
 	}
 	private void OnDisable()
 	{
-		InputEvents.OnSwipe -= Move;
 		InputEvents.OnTouch -= TurnHoldOn;
 		InputEvents.OnEndTouch -= TurnHoldOff;
+
 	}
 	private void Start()
 	{
@@ -36,6 +34,7 @@ public class PlayerController : MonoBehaviour
 	private void FixedUpdate()
 	{
 		Rotate();
+		Move();
 	}
 
 	public void MoveBack()
@@ -43,9 +42,14 @@ public class PlayerController : MonoBehaviour
 		Rb.velocity += -transform.forward * 3;
 	}
 
+	public void Stop()
+	{
+		Rb.velocity = Vector3.zero;
+	}
+
 	private void Rotate()
     {
-		if (touchDetection.CurrentDirection != Vector3.zero && isHolding /*&& !sword.IsStuck*/)
+		if (touchDetection.CurrentDirection != Vector3.zero && isHolding)
 		{
 			var relative = transform.position - (transform.position + touchDetection.CurrentDirection.ToIso());
 			var rot = Quaternion.LookRotation(relative, Vector2.up);
@@ -53,26 +57,33 @@ public class PlayerController : MonoBehaviour
 		}
 	}
 
-	private async void Move (SwipeData data)
+	private void Move()
 	{
-		var scaledStart = new Vector2(data.StartPosition.x / Screen.width, data.StartPosition.y / Screen.height); //TODO возможно заскейлить distance раньше
-		var scaledEnd = new Vector2(data.EndPosition.x / Screen.width, data.EndPosition.y / Screen.height);
-		var distance = Vector2.Distance(scaledStart, scaledEnd);
-
-		if (!isWallJumping)
+		if (isHolding)
 		{
+			var distance = touchDetection.Distance;
 			var smoothedDistance = SmoothDistance(distance);
-			Vector3 velocity = transform.forward * smoothedDistance * speed;
-			Rb.velocity = velocity;
-			await Task.Delay(10);
+			if (distance > 20f)
+			{
+				Vector3 velocity = transform.forward * smoothedDistance * speed;
+				Rb.velocity = velocity;
+			}
+			else
+			{
+				Rb.velocity = Vector3.zero; //Может конфликтовать с Attack
+			}
 		}
 	}
 
 	private float SmoothDistance(float distance)
 	{
-		distance *= 4;
-		var smoothedDistance = Mathf.Clamp(distance, 0.6f, 1f);
-		return smoothedDistance;
+		if (distance > 100)
+		{
+			distance = 100;
+		}
+		distance /= 90;
+		//var smoothedDistance = Mathf.Clamp(distance, 0.6f, 1.5ff);
+		return distance;
 	}
 
 	private void TurnHoldOn()
