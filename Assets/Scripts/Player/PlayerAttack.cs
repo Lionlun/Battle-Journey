@@ -1,103 +1,37 @@
+using System.Threading.Tasks;
 using UnityEngine;
 
+[RequireComponent(typeof(Rigidbody))]
 public class PlayerAttack : MonoBehaviour
 {
-	Animator animator;
-	bool isAttackPhase;
-	int attackDamage = 10;
-	float attackCooldown = 0;
-	float attackCooldownRefresh = 1f;
-	float tapAttackCooldown = 0;
-	float tapAttackCooldownRefresh = 1f;
-	bool isEnemyInRange;
+	private Rigidbody rb;
+	public bool IsAttacking { get; set; }
+	private float attackDashSpeed = 25;
 
 	private void OnEnable()
 	{
-		InputEvents.OnTouch += TapAttack;
+		InputEvents.OnSwipe += Attack;
 	}
 	private void OnDisable()
 	{
-		InputEvents.OnTouch -= TapAttack;
+		InputEvents.OnSwipe -= Attack;
 	}
 	private void Start()
 	{
-		animator = GetComponent<Animator>();
-	}
-	private void Update()
-	{
-		RefreshAttackCooldown();
-		RefreshTapAttackCooldown();
+		rb = GetComponent<Rigidbody>();
 	}
 
-	public void ActivateAttackPhase()
+	private async void Attack(SwipeData data)
 	{
-		isAttackPhase = true;
-	}
+		IsAttacking = true;
+		var scaledStart = new Vector2(data.StartPosition.x / Screen.width, data.StartPosition.y / Screen.height); //TODO возможно заскейлить distance раньше
+		var scaledEnd = new Vector2(data.EndPosition.x / Screen.width, data.EndPosition.y / Screen.height);
+		var distance = Vector2.Distance(scaledStart, scaledEnd);
 
-	public void DeactivateAttackPhase()
-	{
-		isAttackPhase = false;
-	}
+		Vector3 velocity = transform.forward * attackDashSpeed;
+		rb.velocity = velocity;
 
-	void OnTriggerEnter(Collider other)
-	{
-		if (other.gameObject.CompareTag("Enemy"))
-		{
-			
-		}
-	}
-
-	void OnTriggerStay(Collider other)
-	{
-		if (other.gameObject.CompareTag("Enemy"))
-		{
-			isEnemyInRange = true;
-
-			if (attackCooldown <= 0) 
-			{
-				animator.SetTrigger("Attack");
-				attackCooldown = attackCooldownRefresh;
-			}
-			
-			var enemyHealth = other.gameObject.GetComponent<Health>();
-
-			if (isAttackPhase)
-			{
-				enemyHealth.TakeDamage(attackDamage);	
-			}
-		}
-	}
-
-	void OnTriggerExit(Collider other)
-	{
-		if (other.gameObject.CompareTag("Enemy"))
-		{
-			isEnemyInRange = false;
-		}
-	}
-
-	void TapAttack()
-	{
-		if (isEnemyInRange && tapAttackCooldown <= 0)
-		{
-			Debug.Log("Tap Attack");
-			animator.SetTrigger("TapAttack");
-			tapAttackCooldown = tapAttackCooldownRefresh;
-		}
-	}
-
-	void RefreshAttackCooldown()
-	{
-		if (attackCooldown > 0)
-		{
-			attackCooldown -= Time.deltaTime;
-		}
-	}
-	void RefreshTapAttackCooldown()
-	{
-		if (tapAttackCooldown > 0)
-		{
-			tapAttackCooldown -= Time.deltaTime;
-		}
+		await Task.Delay(300);
+		IsAttacking = false;
 	}
 }
