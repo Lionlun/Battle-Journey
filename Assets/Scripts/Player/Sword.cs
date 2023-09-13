@@ -8,6 +8,7 @@ public class Sword : MonoBehaviour
 	[SerializeField] private PlayerController player;
 
 	[SerializeField] private PlayerSwordGrab playerGrab;
+	[SerializeField] private PlayerAttack playerAttack;
 
 	private int damage = 25;
 	private float minimumSpeedToPenetrate = 6;
@@ -55,7 +56,7 @@ public class Sword : MonoBehaviour
 		{
 			var enemy = other.gameObject.GetComponent<Enemy>();
 
-			if (player.Rb.velocity.magnitude > minimumSpeedToPenetrate)
+			if (playerAttack.IsAttacking)
 			{
 				var enemyHealth = other.gameObject.GetComponent<Health>();
 
@@ -74,9 +75,10 @@ public class Sword : MonoBehaviour
 		{
 			var wall = other.gameObject.GetComponent<Wall>();
 
-			if (player.Rb.velocity.magnitude > minimumSpeedToPenetrate && !player.IsUnstucking)
+			if (playerAttack.IsAttacking && !player.IsUnstucking)
 			{
 				ObjectStuck();
+				player.Stop();
 			}
 		}
 	}
