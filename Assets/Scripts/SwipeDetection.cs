@@ -6,6 +6,10 @@ public class SwipeDetection : MonoBehaviour
 	private Vector2 fingerUpPosition;
 	public Vector2 fingerCurrentPosition;
 	[SerializeField] private float minDistanceForSwipe = 20f;
+	[SerializeField] private float maxTimeForSwipe = 0.25f;
+	private float swipeStartTime;
+	private float swipeEndTime;
+	private float swipeDuration;
 
 	private void Update()
 	{
@@ -13,6 +17,7 @@ public class SwipeDetection : MonoBehaviour
 		{
 			if (touch.phase == UnityEngine.TouchPhase.Began)
 			{
+				swipeStartTime = Time.time;
 				fingerUpPosition = touch.position;
 				fingerDownPosition = touch.position;
 				fingerCurrentPosition = touch.position;
@@ -23,7 +28,10 @@ public class SwipeDetection : MonoBehaviour
 
 			if(touch.phase == UnityEngine.TouchPhase.Ended)
 			{
+				swipeEndTime = Time.time;
 				fingerDownPosition = touch.position;
+				swipeDuration = swipeEndTime - swipeStartTime;
+
 				DetectSwipe();
 			}
 		}
@@ -31,8 +39,9 @@ public class SwipeDetection : MonoBehaviour
 
 	private void DetectSwipe()
 	{
-		if (SwipeDistanceCheckMet())
+		if (SwipeDistanceCheckMet() && SwipeTimeCheck())
 		{
+			Debug.Log("Swipe time is " + swipeDuration);
 			if (IsVerticalSwipe())
 			{
 				var direction = fingerDownPosition.y - fingerUpPosition.y > 0 ? SwipeDirection.Up : SwipeDirection.Down;
@@ -52,6 +61,11 @@ public class SwipeDetection : MonoBehaviour
 	private bool SwipeDistanceCheckMet()
 	{
 		return VerticalMovementDistance() > minDistanceForSwipe || HorizontalMovementDistance() > minDistanceForSwipe;
+	}
+
+	private bool SwipeTimeCheck()
+	{
+		return swipeDuration < maxTimeForSwipe;
 	}
 
 	private float VerticalMovementDistance()
