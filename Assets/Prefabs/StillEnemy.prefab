@@ -16,7 +16,6 @@ GameObject:
   - component: {fileID: 3208556487208783995}
   - component: {fileID: 3208556487208783993}
   - component: {fileID: 3208556487208783990}
-  - component: {fileID: 3208556487208783991}
   m_Layer: 11
   m_Name: StillEnemy
   m_TagString: Enemy
@@ -149,20 +148,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9e023123dada2ec4caa3d462ed49dcc9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &3208556487208783991
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3208556487208783937}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eee934040b544d742a42e997bacaa661, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  enemyButtonPrefab: {fileID: 863359730507865528, guid: 71968caec5def594d97c52189dd32219,
-    type: 3}
 --- !u!1 &3208556487436191942
 GameObject:
   m_ObjectHideFlags: 0
