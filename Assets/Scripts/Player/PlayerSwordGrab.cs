@@ -9,6 +9,7 @@ public class PlayerSwordGrab : MonoBehaviour
 	[SerializeField] TouchDetection touchDetection;
 	private float holdTimeToUnstuck;
 	private float holdTimeRefresh = 0.5f;
+	private float minDistanceToGrab = 1.5f;
 
 	private void OnEnable()
 	{
@@ -35,7 +36,7 @@ public class PlayerSwordGrab : MonoBehaviour
 
 	private void ControlSwordHinge()
 	{
-		if (IsInHands && holdTimeToUnstuck < 0)
+		if (sword.IsStuck && IsInHands && holdTimeToUnstuck < 0 && CheckDistanceToSword() < minDistanceToGrab)
 		{
 			hinge.Activate();
 		}
@@ -53,7 +54,7 @@ public class PlayerSwordGrab : MonoBehaviour
 
 	private void GrabSword()
 	{
-        if (CheckDistanceToSword() < 2)
+        if (CheckDistanceToSword() < minDistanceToGrab && sword.IsStuck)
         {
 			IsInHands = true;
 		}
@@ -74,12 +75,14 @@ public class PlayerSwordGrab : MonoBehaviour
 	}
 	private void HandleSwordUnstuck()
 	{
-		if (touchDetection.Distance > 100 && IsInHands)
+		if (holdTimeToUnstuck < 0)
 		{
-			if (holdTimeToUnstuck < 0)
+			if (touchDetection.Distance > 100 && IsInHands && CheckDistanceToSword() < minDistanceToGrab)
 			{
 				sword.Unstuck();
 			}
 		}
+		
+		
 	}
 }
