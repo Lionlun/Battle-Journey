@@ -41,7 +41,6 @@ public class SwipeDetection : MonoBehaviour
 	{
 		if (SwipeDistanceCheckMet() && SwipeTimeCheck())
 		{
-			Debug.Log("Swipe time is " + swipeDuration);
 			if (IsVerticalSwipe())
 			{
 				var direction = fingerDownPosition.y - fingerUpPosition.y > 0 ? SwipeDirection.Up : SwipeDirection.Down;

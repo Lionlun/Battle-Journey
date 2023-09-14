@@ -2,10 +2,10 @@ using UnityEngine;
 
 public class EnemyWeapon : MonoBehaviour
 {
-	private bool isAttackPhase;
-	private int damage = 10;
 	[SerializeField] private Transform enemy;
 	[SerializeField] float knockBackForce = 10;
+	private bool isAttackPhase;
+	private int damage = 10;
 
 	public void SetAttackPhaseTrue()
 	{
@@ -27,8 +27,6 @@ public class EnemyWeapon : MonoBehaviour
 			{
 				playerHealth.TakeDamage(damage);
 				playerKnockback.KnockBack(enemy.position, knockBackForce);
-				
-				Debug.Log("Damage Taken");
 			}
 		}
 	}
