@@ -16,6 +16,8 @@ GameObject:
   - component: {fileID: 3208556487208783995}
   - component: {fileID: 3208556487208783993}
   - component: {fileID: 3208556487208783990}
+  - component: {fileID: 1687783090097889310}
+  - component: {fileID: 2951360526528561379}
   m_Layer: 11
   m_Name: StillEnemy
   m_TagString: Enemy
@@ -146,6 +148,41 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9e023123dada2ec4caa3d462ed49dcc9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1687783090097889310
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3208556487208783937}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 69d5a91a8ca59a744802f231a42368ee, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Angle: 360
+  IsPlayerSeen: 0
+  Radius: 200
+  DirectionToTarget: {x: 0, y: 0, z: 0}
+  Player: {fileID: 0}
+  targetMask:
+    serializedVersion: 2
+    m_Bits: 512
+  obstructionMask:
+    serializedVersion: 2
+    m_Bits: 0
+--- !u!114 &2951360526528561379
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3208556487208783937}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b6dad8c9d952101428e1a2c08c631415, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &3208556487436191942
@@ -590,4 +627,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enemy: {fileID: 3208556487208783994}
-  knockBackForce: 15
+  knockBackForce: 1
