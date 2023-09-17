@@ -2,7 +2,8 @@ using UnityEngine;
 
 public class ObjectClick : MonoBehaviour
 {
-	private RaycastHit raycastHit;
+	[SerializeField] private RaycastHit raycastHit;
+	[SerializeField] private LayerMask layerToIgnore;
 
 	private void OnEnable()
 	{
@@ -17,7 +18,7 @@ public class ObjectClick : MonoBehaviour
 	{
 		Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
-		if (Physics.Raycast(ray, out raycastHit))
+		if (Physics.Raycast(ray, out raycastHit, float.MaxValue, ~layerToIgnore))
 		{
 			if (raycastHit.transform.gameObject.GetComponent<PlayerController>() != null)
 			{
