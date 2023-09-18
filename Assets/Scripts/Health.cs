@@ -5,7 +5,7 @@ using UnityEngine;
 public class Health : MonoBehaviour
 {
     [SerializeField] int maxHealth = 100;
-    [SerializeField] int currentHealth;
+    public int CurrentHealth { get; set; }
 	[SerializeField] float takeDamageCooldownRefresh = 0.5f;
 	float takeDamageCooldown = 0;
     IHealthUI objectHealthtUI;
@@ -13,13 +13,13 @@ public class Health : MonoBehaviour
 
 	void Start()
     {
-        currentHealth = maxHealth;
+        CurrentHealth = maxHealth;
 		objectHealthtUI = GetComponent<IHealthUI>();
 	}
 
 	void Update()
 	{
-		if (currentHealth <= 0)
+		if (CurrentHealth <= 0)
 		{
             Die();
 		}
@@ -28,30 +28,30 @@ public class Health : MonoBehaviour
 	}
 	public int ReturnHealth()
 	{
-		return currentHealth;
+		return CurrentHealth;
 	}
 
 	public void TakeDamage(int damage)
     {
         if (takeDamageCooldown <= 0)
         {
-			currentHealth -= damage;
+			CurrentHealth -= damage;
             takeDamageCooldown = takeDamageCooldownRefresh;
             objectHealthtUI.ShowTakeDamage();
 		}
 
-		if (currentHealth < 0)
+		if (CurrentHealth < 0)
 		{
-			currentHealth = 0;
+			CurrentHealth = 0;
 		}
 	}
 
     public void GetHealth(int health)
     {
-        currentHealth += health;
-        if(currentHealth > 100)
+        CurrentHealth += health;
+        if(CurrentHealth > 100)
         {
-            currentHealth = 100;
+            CurrentHealth = 100;
         }
     }
 
