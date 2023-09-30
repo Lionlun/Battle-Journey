@@ -1,13 +1,10 @@
-
-using System.Collections.Generic;
 using UnityEngine;
 
 public class MazeGenerator
 {
     public int MazeWidth;
     public int MazeHeight;
-    public int StartX, StartY;
-    NewMazeCell[,] maze;
+    NewFloorTile[,] floorTiles;
 
     public MazeGenerator(int mazeWidth, int mazeHeight)
     {
@@ -15,39 +12,33 @@ public class MazeGenerator
         this.MazeHeight = mazeHeight;
     }
 
-    public NewMazeCell[,] GetMaze()
+    public NewFloorTile[,] GetMaze()
     {
-        maze = new NewMazeCell[MazeWidth, MazeHeight];
+        floorTiles = new NewFloorTile[MazeWidth, MazeHeight];
 
         for (int x = 0; x < MazeWidth; x++)
         {
             for (int y = 0; y < MazeHeight; y++)
             {
-                maze[x, y] = new NewMazeCell(x, y);
+                floorTiles[x, y] = new NewFloorTile(x, y);
             }
         }
 
-        return maze;
+        return floorTiles;
     }
 }
-public class NewMazeCell
+public class NewFloorTile
 {
-	public bool Visited;
 	public int X, Y;
-	public bool IsTopWall;
-	public bool IsLeftWall;
 
 	public Vector2Int Position
 	{
 		get { return new Vector2Int(X, Y); }
 	}
 
-	public NewMazeCell(int x, int y)
+	public NewFloorTile(int x, int y)
 	{
 		this.X = x;
 		this.Y = y;
-		Visited = false;
-		IsTopWall = false;
-		IsLeftWall = false;
 	}
 }
